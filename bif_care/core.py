@@ -19,7 +19,7 @@ from csbdeep.utils.tf import limit_gpu_memory
 from csbdeep.io import load_training_data
 from csbdeep.models import Config, CARE
 
-from utils import JVM, get_file_list, get_pixel_dimensions, get_upscale_factors
+from .utils import JVM, get_file_list, get_pixel_dimensions, get_upscale_factors
 
 class BifCareInputConverter(object):
     def __init__(self, **params): 
