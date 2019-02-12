@@ -8,7 +8,6 @@ from  .qt_dir_dialog import gui_dirname
 from .bif_care import BifCareInputConverter
 from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, check_file_lists
 
-
 # global parameters
 params = {"in_dir": "."}
 
@@ -106,7 +105,7 @@ def select_inputs_widget():
     display(widgets.VBox([select_directories, select_files, widgets.HBox([btn_convert, text_convert_repy]), out_convert]))
 
 ### channel select
-##################
+################## 
 def gui_select_channel_widget():
     channels = list(range(get_pixel_dimensions(get_file_list(params["in_dir"], params["low_wc"])[0]).c))
     channels_str = list(map(str, channels))

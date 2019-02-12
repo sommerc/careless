@@ -7,7 +7,7 @@ def gui_fname(directory='./'):
     the chosen filename"""
     # run this exact file in a separate process, and grab the result
     file = check_output([executable, __file__, directory])
-    return file.strip().decode("utf-8")
+    return file.strip().decode("utf-8")     
 
 if __name__ == "__main__":
     directory = argv[1]

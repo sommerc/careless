@@ -71,8 +71,11 @@ class BifCareInputConverter(object):
 
     def convert(self):
         low_scaling = get_upscale_factors(self.in_dir, self.low_wc, self.high_wc)
+        if (numpy.array(low_scaling) == 1).all():
+            low_scaling = None
         self._convert(self.low_wc, "low", low_scaling)
         self._convert(self.high_wc, "GT")
+        print("Done")
 
 class BifCareTrainer(object):
     def __init__(self, **params): 
@@ -80,7 +83,7 @@ class BifCareTrainer(object):
 
     def create_patches(self):
         for ch in self.train_channels:
-            print("Creating patches for channel: {}".format(ch))
+            print("-- Creating patches for channel: {}".format(ch))
             raw_data = RawData.from_folder (
                                     basepath    = pathlib.Path(self.out_dir) / "train_data" / "raw" / "CH_{}".format(ch),
                                     source_dirs = ['low'],
@@ -95,6 +98,7 @@ class BifCareTrainer(object):
                 save_file           = self.get_training_patch_path() / 'CH_{}_training_patches.npz'.format(ch),
                 verbose             = False,
             )
+        print("Done")
         return self
 
     def get_training_patch_path(self):
@@ -106,7 +110,7 @@ class BifCareTrainer(object):
             channels = self.train_channels
 
         for ch in channels:
-            print("Training channel {}".format(ch))
+            print("-- Training channel {}".format(ch))
             (X,Y), (X_val,Y_val), axes = load_training_data(self.get_training_patch_path() / 'CH_{}_training_patches.npz'.format(ch), validation_split=0.1, verbose=False)
 
             c = axes_dict(axes)['C']
@@ -116,17 +120,25 @@ class BifCareTrainer(object):
                                                                train_steps_per_epoch=self.train_steps_per_epoch,
                                                                train_batch_size=self.train_batch_size,
                                                                **config_args)
-            # print(config)
-            # vars(config)
-
+            # Training
             model = CARE(config, 'CH_{}_model'.format(ch), basedir=pathlib.Path(self.out_dir) / 'models')
 
+            # Show learning curve and example validation results
             history = model.train(X,Y, validation_data=(X_val,Y_val))
 
 
-            print(sorted(list(history.history.keys())))
+            #print(sorted(list(history.history.keys())))
             plt.figure(figsize=(16,5))
             plot_history(history,['loss','val_loss'],['mse','val_mse','mae','val_mae'])
+
+            plt.figure(figsize=(12,7))
+            _P = model.keras_model.predict(X_val[:5])
+
+            plot_some(X_val[:5], Y_val[:5], _P, pmax=99.5, cmap="gray")
+            plt.suptitle('5 example validation patches\n'      
+                        'top row: input (source),  '          
+                        'middle row: target (ground truth),  '
+                        'bottom row: predicted from source');
 
             plt.show() 
 
@@ -186,40 +198,48 @@ class BifCareTrainer(object):
                 tifffile.imsave(ch_out_fn, pred[None,:, None, :, :], imagej=True, metadata={'axes': 'TZCYX'})
 
 ### TODO: tests here outdated
+
+class TestCase(object):
+    config = {
+        "in_dir" : "test_tribolium",
+        "out_dir": "test_tribolium",
+        "low_wc"  = "*low*"
+        "high_wc" = "*high*"
+        "patch_size": [16, 128, 128], 
+        "n_patches_per_image": 128, 
+        "train_epochs": 2, 
+        "train_steps_per_epoch": 10, 
+        "train_batch_size": 16, 
+        "train_channels": [0], 
+        "low_scaling": [1.0, 1.0, 1.0]
+
+    }
+
 def test_convert():
-    in_dir = "J:/heisegrp/SteScratch/To BIF/to_Robert"
-
-    low_wc  = "*low*.czi"
-    high_wc = "*high*.czi"
-
-    low_scaling  = (1, 2, 2)
-    high_scaling = (1, 0.5, 0.5)
-
-    out_dir = pathlib.Path("./test")
-
-    bifc = BifCareInputConverter(in_dir, out_dir, 
-                            low_wc, high_wc, low_scaling, high_scaling)
+    bifc = BifCareInputConverter(**self.config)
     bifc.convert()
 
-def test_data_gen():
-    bift = BifCareTrainer("J:/imagegrp/CS/bif_care/bif_care/test")
-    bift.prepare()
+def test_create_patches():
+    bift = BifCareTrainer(**self.config)
+    bift.create_patches()
 
 def test_train():
-    bift = BifCareTrainer("J:/imagegrp/CS/bif_care/bif_care/test")
-    bift.train(channels=["CH_0"])
+    bift = BifCareTrainer(**self.config)
+    bift.train()
+    bift.save()
 
 def test_predict():
-    bift = BifCareTrainer("J:/imagegrp/CS/bif_care/bif_care/test")
-    bift.predict("J:/heisegrp/SteScratch/To BIF/to_Robert/190128_CAMypt_Ctrl_AcquisitionBlock1_pt1.czi", 
-                 channel=1, 
-                 low_scaling=(1, 2, 2))
+    bift = BifCareTrainer(**self.config)
+    bift.predict(os.path.join(self.config["in_dir"], "nGFP_0.1_0.2_0.5_20_14_late_low.tif"))
 
 
 if __name__ == "__main__":
     JVM().start()
     try:
-        print("test outdated")
+        test_convert()
+        test_create_patches()
+        test_train()
+        test_predict()
     except Exception as e:
         raise
     finally:

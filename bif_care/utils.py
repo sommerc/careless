@@ -58,6 +58,23 @@ def check_file_lists(in_dir, low_wc, high_wc):
         if os.path.splitext(fl.name)[1] != os.path.splitext(fh.name)[1]:
             return False, "Extensions do not match"
 
+        dim_low  = get_pixel_dimensions(fl)
+        dim_high = get_pixel_dimensions(fh)
+
+        if dim_low.c != dim_high.c:
+            return False, "Low and high quality images have different channels\n '{}' != '{}'".format(fl, fh)
+
+        if dim_low.t != dim_high.t:
+            return False, "Low and high quality images have different number of time points\n '{}' != '{}'".format(fl, fh)
+        
+        if (dim_low.x > dim_high.x) or \
+           (dim_low.y > dim_high.y) or \
+           (dim_low.z > dim_high.z):
+           return False, "Low quality images have higher spatial resolution"
+
+        if (dim_low.t > dim_low.z) and \
+            (dim_low.z == 1):
+            return False, "Only 1 z-slice in '{}' but {} frames. Make sure input images are Z-stacks.".format(fl, dim_low.t)
 
     return True, "OK"
 
