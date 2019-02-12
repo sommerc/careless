@@ -5,7 +5,7 @@ from functools import partial
 from IPython.display import display
 from .qt_file_dialog import gui_fname
 from  .qt_dir_dialog import gui_dirname
-from .bif_care import BifCareInputConverter
+from .core import BifCareInputConverter
 from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, check_file_lists
 
 # global parameters
