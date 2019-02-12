@@ -81,6 +81,7 @@ def select_inputs_widget():
 
     @out_convert.capture(clear_output=True, wait=True)
     def btn_convert_clicked(btn):
+        text_convert_repy.value = "Checking..."
         check_ok, msg = check_file_lists(params["in_dir"], params["low_wc"], params["high_wc"])
         if not check_ok: 
             text_convert_repy.value = msg
