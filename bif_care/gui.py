@@ -1,21 +1,89 @@
 import os
+import json
 import pathlib
 import ipywidgets as widgets
 from functools import partial
 from IPython.display import display
 from .qt_file_dialog import gui_fname
-from  .qt_dir_dialog import gui_dirname
+from .qt_dir_dialog import gui_dirname
+from .qt_filesave_dialog import gui_fsavename
 from .core import BifCareInputConverter
 from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, check_file_lists
 
 # global parameters
-params = {"in_dir": "."}
 
-def select_inputs_widget():
+
+class GuiParams(dict):
+    _file = None
+    def load(self, proj_fn):
+        with open(proj_fn, "r") as read_file:
+            params = json.load(read_file)
+            for k, v in params.items():
+                self[k] = v
+        GuiParams._file = proj_fn
+
+    def saveas(self, proj_fn):
+        GuiParams._file = proj_fn
+        self.save()
+        
+    def save(self):
+        with open(GuiParams._file, "w") as save_file:
+            json.dump(self, save_file)
+
+    def initialize(self):
+        self.clear()
+        self["in_dir"]  = "."
+        self["out_dir"] = "."
+        self["low_wc"] = ""
+        self["high_wc"] = ""
+        self['patch_size'] = [16, 64, 64]
+        self['n_patches_per_image'] = 128
+        self["train_channels"] = [0]
+        self['train_epochs'] = 40
+        self['train_steps_per_epoch'] = 100
+        self['train_batch_size'] = 16
+
+
+
+
+params = GuiParams()
+params.initialize()
+
+
+def select_project():
+    btn_new_proj = widgets.Button(description="New")
+    btn_load_proj = widgets.Button(description="Load")
+
+    out_project = widgets.Output()
+
+    @out_project.capture(clear_output=True, wait=True)
+    def btn_btn_new_proj_clicked(btn):
+        new_proj_fn = gui_fsavename("./bif_care.json")
+        if len(new_proj_fn) == 0:
+            return
+        params.initialize()
+        params.saveas(new_proj_fn)
+        print("New project initialized: '{}'".format(new_proj_fn))
+    btn_new_proj.on_click(btn_btn_new_proj_clicked)   
+
+    @out_project.capture(clear_output=True, wait=True)
+    def btn_btn_load_proj_clicked(btn):
+        proj_fn = gui_fname()
+        if len(proj_fn) == 0:
+            return
+        params.load(proj_fn)
+        print("Project loaded: '{}'".format(proj_fn))
+    btn_load_proj.on_click(btn_btn_load_proj_clicked)  
+
+    display(widgets.VBox([ widgets.HBox([widgets.Label("Project:"), btn_new_proj, btn_load_proj]),
+                            out_project])) 
+
+
+def select_input():
     ### Input directory
     ###################
     btn_in_dir = widgets.Button(description="Select input folder")
-    text_in_dir = widgets.Label(".", layout={'border': '1px solid black', "width":"400px"})
+    text_in_dir = widgets.Label(params["in_dir"], layout={'border': '1px solid black', "width":"400px"})
 
     def btn_out_in_dir_clicked(btn):
         dir_name = gui_dirname()
@@ -28,7 +96,7 @@ def select_inputs_widget():
     ### Output directory
     #####################
     btn_out_dir = widgets.Button(description="Select output folder")
-    text_out_dir = widgets.Label(".", layout={'border': '1px solid black', "width":"400px"})
+    text_out_dir = widgets.Label(params["out_dir"], layout={'border': '1px solid black', "width":"400px"})
 
     def btn_out_out_dir_clicked(btn):
         dir_name = gui_dirname()
@@ -68,7 +136,8 @@ def select_inputs_widget():
                                     widgets.HBox([label_in_dir, 
                                                 widgets.Label("/"), text_wc_low]), 
                                     out_files_low])  
-        text_wc_low.value = ""
+
+        text_wc_low.value = params[key]
         return file_select_widget
 
     ### Convert button
@@ -105,32 +174,37 @@ def select_inputs_widget():
 
     display(widgets.VBox([select_directories, select_files, widgets.HBox([btn_convert, text_convert_repy]), out_convert]))
 
+
+
+
+
 ### channel select
 ################## 
 def gui_select_channel_widget():
-    channels = list(range(get_pixel_dimensions(get_file_list(params["in_dir"], params["low_wc"])[0]).c))
-    channels_str = list(map(str, channels))
+    available_channels = list(range(get_pixel_dimensions(get_file_list(params["in_dir"], params["low_wc"])[0]).c))
+    available_channels_str = list(map(str, available_channels))
+
+    channel_str = list(map(str, params["train_channels"]))
+
     ms_channel = widgets.widgets.SelectMultiple(
-                                            options=channels_str,
-                                            value=channels_str,
-                                            rows=len(channels_str),  
+                                            options=available_channels_str,
+                                            value=channel_str,
+                                            rows=len(available_channels_str),  
                                         )
     def on_channel_change(change):
         params['train_channels'] = list(map(int, change.new))
 
     ms_channel.observe(on_channel_change, 'value')
-    ms_channel.value = channels_str
-    params["train_channels"] = channels
+    ms_channel.value = channel_str
     return ms_channel
 
-### Train parameter 
-###################
-def select_train_paramter_widget():
+
+def select_patch_parameter():
     ### Path size select
     ####################
     patch_size_select = []
     patch_options = [8, 16, 32, 64, 128]
-    params['patch_size'] = [16, 64, 64] 
+     
     for j, a in enumerate(['Z', 'Y', 'X']):
         wi = widgets.Dropdown(options=list(map(str, patch_options)),
                             value=str(params['patch_size'][j]),
@@ -147,58 +221,71 @@ def select_train_paramter_widget():
 
     patch_size_select = widgets.HBox(patch_size_select)
 
-    dd_n_patch_per_img = widgets.Dropdown(options=[128, 256, 512, 1024, 2048],
-                                        value=128)
 
     ### Number of patches per image
     ###############################
-    params['n_patches_per_image'] = 128
+
+    dd_n_patch_per_img = widgets.Dropdown(options=[128, 256, 512, 1024, 2048, 4096],
+                                          value=params['n_patches_per_image'])
+
     def on_n_patch_per_img_change(change):
         params['n_patches_per_image'] = change.new
 
     dd_n_patch_per_img.observe(on_n_patch_per_img_change, 'value')
-    dd_n_patch_per_img.value = 128
 
+    ms_channel = gui_select_channel_widget()
+
+    btn_show_patch = widgets.Button(description='Show random patch')
+
+    patch_parameter = widgets.VBox(
+                               [widgets.HBox([widgets.Label('Channels', layout={'width':'100px'}), ms_channel]), 
+                                widgets.HBox([widgets.Label('Patch size', layout={'width':'100px'}), patch_size_select]), 
+                                widgets.HBox([widgets.Label('#Patches / image', layout={'width':'100px'}), dd_n_patch_per_img]),
+                                btn_show_patch
+                                ])
+
+    display(patch_parameter)
+
+
+
+
+### Train parameter 
+###################
+def select_train_paramter():
     ### Training epochs
     ###################
-    int_train_epochs = widgets.IntSlider(value=40, min=10, max=100, step=5,)
-    params['train_epochs'] = 40
+    int_train_epochs = widgets.IntSlider(value=params['train_epochs'], min=10, max=100, step=5,)
+    
     def on_int_train_epochs_change(change):
         params['train_epochs'] = change.new
 
     int_train_epochs.observe(on_int_train_epochs_change, 'value')
-    int_train_epochs.value = 40
 
     ### Steps per epoch
     ###################
-    int_train_steps_per_epoch = widgets.IntSlider(value=100, min=10, max=400, step=10,)
-    params['train_steps_per_epoch'] = 100
+    int_train_steps_per_epoch = widgets.IntSlider(value=params['train_steps_per_epoch'], min=10, max=500, step=10,)
+    
     def on_train_steps_per_epoch_change(change):
         params['train_steps_per_epoch'] = change.new
 
     int_train_steps_per_epoch.observe(on_train_steps_per_epoch_change, 'value')
-    int_train_steps_per_epoch.value = 100
     
     
     ### Batch size
     ##############
-    dd_train_batch_size = widgets.Dropdown(options=[8, 16, 32, 64, 128], value=16) 
-    params['train_batch_size'] = 16
+    dd_train_batch_size = widgets.Dropdown(options=[8, 16, 32, 64, 128], value=params['train_batch_size']) 
+    
     def on_dd_train_batch_size_change(change):
         params['train_batch_size'] = change.new
 
     dd_train_batch_size.observe(on_dd_train_batch_size_change, 'value')
-    dd_train_batch_size.value = 16
 
-    ms_channel = gui_select_channel_widget()
+
 
     ### Combine
     ##############
     train_parameter = widgets.VBox(
-                               [widgets.HBox([widgets.Label('Channels', layout={'width':'100px'}), ms_channel]), 
-                                widgets.HBox([widgets.Label('Patch size', layout={'width':'100px'}), patch_size_select]), 
-                                widgets.HBox([widgets.Label('#Patches / image', layout={'width':'100px'}), dd_n_patch_per_img]),
-
+                               [
                                 widgets.HBox([widgets.Label('#Epochs', layout={'width':'100px'}), int_train_epochs]),
                                 widgets.HBox([widgets.Label('#Steps / epoch', layout={'width':'100px'}), int_train_steps_per_epoch]),
                                 widgets.HBox([widgets.Label('Batch size', layout={'width':'100px'}), dd_train_batch_size]),
@@ -207,22 +294,22 @@ def select_train_paramter_widget():
 
     display(train_parameter)
 
-def select_project():
-    btn_project = widgets.Button(description="Select BifCare project (bif_care.json)")
-    if "out_dir" in params.keys() and os.path.exists(os.path.join(params["out_dir"], "bif_care.json")):
-        project_fn = os.path.join(params["out_dir"], "bif_care.json")
-    else:
-        project_fn = ""
+# def select_project_():
+#     btn_project = widgets.Button(description="Select BifCare project (bif_care.json)")
+#     if "out_dir" in params.keys() and os.path.exists(os.path.join(params["out_dir"], "bif_care.json")):
+#         project_fn = os.path.join(params["out_dir"], "bif_care.json")
+#     else:
+#         project_fn = ""
 
-    text_project_fn = widgets.Label(project_fn, layout={'border': '1px solid black', "width":"400px"})
+#     text_project_fn = widgets.Label(project_fn, layout={'border': '1px solid black', "width":"400px"})
 
-    def btn_project_clicked(btn):
-        project_fn = gui_fname()
-        text_project_fn.value = project_fn
+#     def btn_project_clicked(btn):
+#         project_fn = gui_fname()
+#         text_project_fn.value = project_fn
 
-    btn_project.on_click(btn_project_clicked)       
-    display(widgets.HBox([text_project_fn, btn_project]))
-    return text_project_fn
+#     btn_project.on_click(btn_project_clicked)       
+#     display(widgets.HBox([text_project_fn, btn_project]))
+#     return text_project_fn
 
 def select_file_to_predict(): 
     btn_predict_file = widgets.Button(description="Select file for prediction")
