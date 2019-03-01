@@ -8,7 +8,7 @@ from collections import namedtuple
 Axes = namedtuple("Axes", "t z c y x")
 
 class JVM(object):
-    log_config = "res/log4j.properties"
+    log_config = os.path.join(os.path.dirname(__file__), "res/log4j.properties")
     started = False
 
     def start(self):
