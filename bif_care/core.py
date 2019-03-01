@@ -57,7 +57,7 @@ class BifCareInputConverter(object):
                 img_3d_ch = img_3d[:, c, :, :]
                 if conv_scaling:
                     img_3d_ch = rescale(img_3d_ch, conv_scaling, preserve_range=True, 
-                                        order=0, 
+                                        order=1, 
                                         multichannel=False,
                                         mode="reflect",
                                         anti_aliasing=True)
@@ -181,7 +181,7 @@ class BifCareTrainer(object):
                                                 t=t, rescale=False)
 
                 img_3d_ch_ex = rescale(img_3d, self.low_scaling, preserve_range=True, 
-                                        order=0, 
+                                        order=1, 
                                         multichannel=False,
                                         mode="reflect",
                                         anti_aliasing=True)
