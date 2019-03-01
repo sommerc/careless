@@ -192,7 +192,7 @@ class BifCareTrainer(object):
                 pred = pred.clip(di.min, di.max).astype(dtype)
 
             
-                ch_out_fn = os.path.join(os.path.dirname(file_fn), "care_predict_tp{:04d}_ch{}.tif".format(t, ch))
+                ch_out_fn = os.path.join(os.path.dirname(file_fn), os.path.splitext(os.path.basename(file_fn))[0] + "_care_predict_tp{:04d}_ch{}.tif".format(t, ch))
                 print("Saving time-point {} and channel {} to file '{}'".format(t, ch, ch_out_fn))
                 tifffile.imsave(ch_out_fn, pred[None,:, None, :, :], imagej=True, metadata={'axes': 'TZCYX'})
 
