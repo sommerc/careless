@@ -150,18 +150,6 @@ class BifCareTrainer(object):
 
             plt.show() 
 
-    def save(self):
-        save_fn = os.path.join(self.out_dir, "bif_care.json" )
-        with open(save_fn, "w") as save_file:
-            json.dump(self.__dict__, save_file)
-        print("BifCare saved to {:s}".format(save_fn))
-
-    @classmethod
-    def load(cls, project_fn):
-        with open(project_fn, "r") as read_file:
-            params = json.load(read_file)
-        return cls(**params)
-
     def predict(self, file_fn, n_tiles=(1,4,4)):
         JVM().start()
         ir = bf.ImageReader(file_fn)
@@ -204,9 +192,21 @@ class BifCareTrainer(object):
                 di = numpy.iinfo(dtype)
                 pred = pred.clip(di.min, di.max).astype(dtype)
 
+                if False:
+                    ch_t_out_fn = os.path.join(os.path.dirname(file_fn), os.path.splitext(os.path.basename(file_fn))[0] + "_care_predict_tp{:04d}_ch{}.tif".format(t, ch))
+                    print("Saving time-point {} and channel {} to file '{}'".format(t, ch, ch_t_out_fn))
+                    tifffile.imsave(ch_t_out_fn, pred[None,:, None, :, :], imagej=True, metadata={'axes': 'TZCYX'})
+
+        
+                res_image_ch[t, :, 0, :, :] = pred
+            ch_out_fn = os.path.join(os.path.dirname(file_fn), 
+                                     os.path.splitext(os.path.basename(file_fn))[0] 
+                                     + "_care_predict_ch{}.tif".format(ch))
+            print("Saving channel {} CARE prediction to file '{}'".format(ch, ch_out_fn))
+            tifffile.imsave(ch_out_fn, res_image_ch, imagej=True, metadata={'axes': 'TZCYX'})
+
+
             
-                ch_out_fn = os.path.join(os.path.dirname(file_fn), os.path.splitext(os.path.basename(file_fn))[0] + "_care_predict_tp{:04d}_ch{}.tif".format(t, ch))
-                print("Saving time-point {} and channel {} to file '{}'".format(t, ch, ch_out_fn))
-                tifffile.imsave(ch_out_fn, pred[None,:, None, :, :], imagej=True, metadata={'axes': 'TZCYX'})
+                
 
 
