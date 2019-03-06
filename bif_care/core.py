@@ -175,11 +175,15 @@ class BifCareTrainer(object):
         c_size = reader.getSizeC()
         t_size = reader.getSizeT()
 
+        z_out_size = int(z_size * self.low_scaling[0])
+        y_out_size = int(y_size * self.low_scaling[1])
+        x_out_size = int(x_size * self.low_scaling[2])
+
         assert c_size == len(self.train_channels), "Number of Channels during training and prediction do not match"
         
         for ch in self.train_channels:
             model = CARE(None, 'CH_{}_model'.format(ch), basedir=pathlib.Path(self.out_dir) / 'models')
-            res_image_ch = []
+            res_image_ch = numpy.zeros(shape=(t_size, z_out_size, 1, y_out_size, x_out_size), dtype=dtype)
             print("Predicting channel {}".format(ch))
             for t in tqdm(range(t_size), total=t_size):
                 img_3d = numpy.zeros((z_size, y_size, x_size), dtype=dtype)
