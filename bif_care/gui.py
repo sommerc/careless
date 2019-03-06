@@ -1,14 +1,18 @@
 import os
 import json
+import numpy
 import pathlib
 import ipywidgets as widgets
 from functools import partial
 from IPython.display import display
+from csbdeep.utils import plot_some
 from .qt_file_dialog import gui_fname
 from .qt_dir_dialog import gui_dirname
 from .qt_filesave_dialog import gui_fsavename
-from .core import BifCareInputConverter
+from .core import BifCareInputConverter, BifCareTrainer
 from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, check_file_lists
+
+from matplotlib import pyplot as plt
 
 # global parameters
 
@@ -231,17 +235,15 @@ def select_patch_parameter():
     def on_n_patch_per_img_change(change):
         params['n_patches_per_image'] = change.new
 
-    dd_n_patch_per_img.observe(on_n_patch_per_img_change, 'value')
+    dd_n_patch_per_img.observe(on_n_patch_per_img_change, 'value') 
 
     ms_channel = gui_select_channel_widget()
 
-    btn_show_patch = widgets.Button(description='Show random patch')
 
     patch_parameter = widgets.VBox(
                                [widgets.HBox([widgets.Label('Channels', layout={'width':'100px'}), ms_channel]), 
                                 widgets.HBox([widgets.Label('Patch size', layout={'width':'100px'}), patch_size_select]), 
                                 widgets.HBox([widgets.Label('#Patches / image', layout={'width':'100px'}), dd_n_patch_per_img]),
-                                btn_show_patch
                                 ])
 
     display(patch_parameter)
