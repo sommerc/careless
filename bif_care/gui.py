@@ -9,6 +9,7 @@ from csbdeep.utils import plot_some
 from .qt_file_dialog import gui_fname
 from .qt_dir_dialog import gui_dirname
 from .qt_filesave_dialog import gui_fsavename
+from .qt_files_dialog import gui_fnames
 from .core import BifCareInputConverter, BifCareTrainer
 from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, check_file_lists
 
@@ -315,15 +316,19 @@ def select_train_paramter():
 
 def select_file_to_predict(): 
     btn_predict_file = widgets.Button(description="Select file for prediction")
-    text_predict_fn  = widgets.Label("", layout={'border': '1px solid black', "width":"400px"})
-    
+    text_predict_fn  = widgets.Textarea("", layout={'border': '1px solid black', "width":"800px", 'height': '100%'})
+    out_predict_fn = widgets.Output(layout={'border': '1px solid black', "width":"500px", "min_height": "40px"})
+
+    @out_predict_fn.capture(clear_output=True, wait=True)
     def btn_predict_file_clicked(btn):
-        predict_fn = gui_fname()
-        text_predict_fn.value = predict_fn
+        predict_fn = gui_fnames()
+        print(predict_fn) 
+        text_predict_fn.value = predict_fn.replace(";", "\n")
+        
     
     btn_predict_file.on_click(btn_predict_file_clicked)       
     predict_file_widget = widgets.HBox([text_predict_fn, btn_predict_file])
-    display(predict_file_widget)
+    display(widgets.VBox([predict_file_widget, out_predict_fn]))
     return text_predict_fn
 
     
