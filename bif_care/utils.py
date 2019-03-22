@@ -6,6 +6,80 @@ import bioformats as bf
 from collections import namedtuple
 
 Axes = namedtuple("Axes", "t z c y x")
+Reso = namedtuple("PixelSize", "X Y Z T Xunit Yunit Zunit Tunit")
+
+
+def get_space_time_resolution(img_path):
+    omexml = bf.get_omexml_metadata(img_path)
+
+    om = bf.OMEXML(xml=omexml)
+    i = om.image(0)
+
+    # get frame intervall
+    ##########################
+    C = i.Pixels.get_SizeC()
+    Z = i.Pixels.get_SizeZ()
+    T = i.Pixels.get_SizeT()
+    
+    X_res = i.Pixels.get_PhysicalSizeX()
+    Y_res = i.Pixels.get_PhysicalSizeY()
+    Z_res = i.Pixels.get_PhysicalSizeZ()
+    
+    X_res_unit = i.Pixels.get_PhysicalSizeXUnit()
+    Y_res_unit = i.Pixels.get_PhysicalSizeYUnit()
+    Z_res_unit = i.Pixels.get_PhysicalSizeZUnit()
+    
+    if None in [X_res, Y_res]:
+        X_res = Y_res = 1
+    
+    if None in [X_res_unit, Y_res_unit]:
+        X_res_unit = Y_res_unit = "pixel"
+        
+    if Z_res is None:
+        Z_res = 1
+        Z_res_unit = "pixel"
+
+    # check for \mu in string (argh)
+    if '\xb5' in X_res_unit:
+        X_res_unit = "micron"
+        Y_res_unit = "micron"
+
+    if '\xb5' in Z_res_unit:
+        Z_res_unit = "micron"
+
+    
+    
+        
+
+    i.Pixels.get_PhysicalSizeZUnit()
+    
+    frame_interval = 0
+    Tunit = "sec."
+    
+    if i.Pixels.node.get("TimeIncrement"):
+        frame_interval = i.Pixels.node.get("TimeIncrement")
+        Tunit = i.Pixels.node.get("TimeIncrementUnit")
+        
+    elif (T > 1) and i.Pixels.get_plane_count() > 0:
+        plane_axes = i.Pixels.get_DimensionOrder().replace("X", "").replace("Y", "")
+
+        stride_t = 1
+        for axes in plane_axes.upper():
+            if axes == "C":
+                stride_t *= C
+            if axes == "Z":
+                stride_t *= Z
+
+        t_end = stride_t * (T-1)
+
+        print(i.Pixels.get_plane_count(),  t_end)
+        t_end_plane = i.Pixels.Plane(t_end)
+
+        frame_interval = t_end_plane.DeltaT / T
+
+    return Reso(X_res, Y_res, Z_res, frame_interval, X_res_unit, Y_res_unit, Z_res_unit, Tunit)
+
+
 
 class JVM(object):
     log_config = os.path.join(os.path.dirname(__file__), "res/log4j.properties")
@@ -26,8 +100,7 @@ class JVM(object):
 
 def get_pixel_dimensions(fn):
     JVM().start()
-
-    
+ 
     ir = bf.ImageReader(str(fn))
     
     t_size = ir.rdr.getSizeT()
@@ -45,7 +118,7 @@ def get_file_list(in_dir, glob):
 
 def check_file_lists(in_dir, low_wc, high_wc):
     from fnmatch import translate
-    fl_low = get_file_list(in_dir, low_wc)
+    fl_low  = get_file_list(in_dir, low_wc)
     fl_high = get_file_list(in_dir, high_wc)
 
     if len(fl_low) == 0:

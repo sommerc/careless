@@ -19,7 +19,8 @@ from csbdeep.utils.tf import limit_gpu_memory
 from csbdeep.io import load_training_data
 from csbdeep.models import Config, CARE
 
-from .utils import JVM, get_file_list, get_pixel_dimensions, get_upscale_factors
+from .utils import JVM, get_file_list, get_pixel_dimensions, \
+                   get_upscale_factors, get_space_time_resolution
 
 class BifCareInputConverter(object):
     def __init__(self, **params): 
@@ -150,8 +151,11 @@ class BifCareTrainer(object):
 
             plt.show() 
 
-    def predict(self, file_fn, n_tiles=(1,4,4)):
+    def predict(self, file_fn, n_tiles=(1,4,4), keep_meta=True):
         JVM().start()
+
+        pixel_reso = get_space_time_resolution(file_fn)
+
         ir = bf.ImageReader(file_fn)
         reader = ir.rdr
         dtype = numpy.uint16
@@ -167,7 +171,7 @@ class BifCareTrainer(object):
         y_out_size = int(y_size * self.low_scaling[1])
         x_out_size = int(x_size * self.low_scaling[2])
 
-        assert c_size == len(self.train_channels), "Number of Channels during training and prediction do not match"
+        assert c_size == len(self.train_channels), "Number of Channels during training and prediction do not match"    
         
         for ch in self.train_channels:
             model = CARE(None, 'CH_{}_model'.format(ch), basedir=pathlib.Path(self.out_dir) / 'models')
@@ -203,10 +207,20 @@ class BifCareTrainer(object):
                                      os.path.splitext(os.path.basename(file_fn))[0] 
                                      + "_care_predict_ch{}.tif".format(ch))
             print("Saving channel {} CARE prediction to file '{}'".format(ch, ch_out_fn))
-            tifffile.imsave(ch_out_fn, res_image_ch, imagej=True, metadata={'axes': 'TZCYX'})
 
+            if keep_meta:
+                reso      = (1 / (pixel_reso.X / self.low_scaling[2]), 
+                             1 / (pixel_reso.Y / self.low_scaling[1]))
+                spacing   = pixel_reso.Z / self.low_scaling[0]
+                unit      = pixel_reso.Xunit
+                finterval = pixel_reso.T
 
-            
-                
+                tifffile.imsave(ch_out_fn, res_image_ch, imagej=True, resolution=reso, metadata={'axes'     : 'TZCYX',
+                                                                                                 'finterval': finterval,
+                                                                                                 'spacing'  : spacing, 
+                                                                                                 'unit'     : unit})
+            else:
+                tifffile.imsave(ch_out_fn, res_image_ch)
+
 
 

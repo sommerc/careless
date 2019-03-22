@@ -11,7 +11,8 @@ from .qt_dir_dialog import gui_dirname
 from .qt_filesave_dialog import gui_fsavename
 from .qt_files_dialog import gui_fnames
 from .core import BifCareInputConverter, BifCareTrainer
-from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, check_file_lists
+from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, \
+                   check_file_lists, get_space_time_resolution
 
 from matplotlib import pyplot as plt
 
@@ -147,7 +148,6 @@ def select_input():
 
     ### Convert button
     ##################
-
     btn_convert = widgets.Button(description="Check & Convert")
     text_convert_repy = widgets.Label(layout={"width":"500px"})
 
@@ -160,13 +160,16 @@ def select_input():
         if not check_ok: 
             text_convert_repy.value = msg
         else:
-            (z,y,x) = get_upscale_factors(params["in_dir"], params["low_wc"], params["high_wc"])
-            params["low_scaling"] = [z,y,x]
-            text_convert_repy.value = "Low quality images are scaled up by ({}, {}, {}) in ZYX to match high quality resolution".format(z,y,x)
+            params["low_scaling"] = get_upscale_factors(params["in_dir"], params["low_wc"], params["high_wc"])
             
-            BifCareInputConverter(in_dir=params["in_dir"],
+            if (numpy.array(params["low_scaling"]) == 1).all():
+                text_convert_repy.value = "Low quality images match high quality resolution"
+            else:
+                text_convert_repy.value = "Low quality images are scaled up by ({}, {}, {}) in ZYX to match high quality resolution".format(z,y,x)
+            
+            BifCareInputConverter(in_dir =params["in_dir"],
                                   out_dir=params["out_dir"],
-                                  low_wc=params["low_wc"] ,
+                                  low_wc =params["low_wc"] ,
                                   high_wc=params["high_wc"]).convert()
 
     btn_convert.on_click(btn_convert_clicked)     
@@ -315,14 +318,14 @@ def select_train_paramter():
 #     return text_project_fn
 
 def select_file_to_predict(): 
-    btn_predict_file = widgets.Button(description="Select file for prediction")
+    btn_predict_file = widgets.Button(description="Select file(s) for prediction")
     text_predict_fn  = widgets.Textarea("", layout={'border': '1px solid black', "width":"800px", 'height': '100%'})
-    out_predict_fn = widgets.Output(layout={'border': '1px solid black', "width":"500px", "min_height": "40px"})
+    out_predict_fn   = widgets.Output(layout={ "width":"800px", "min_height": "40px"})
 
     @out_predict_fn.capture(clear_output=True, wait=True)
     def btn_predict_file_clicked(btn):
         predict_fn = gui_fnames()
-        print(predict_fn) 
+        #print(predict_fn) 
         text_predict_fn.value = predict_fn.replace(";", "\n")
         
     
