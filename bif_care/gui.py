@@ -165,7 +165,7 @@ def select_input():
             if (numpy.array(params["low_scaling"]) == 1).all():
                 text_convert_repy.value = "Low quality images match high quality resolution"
             else:
-                text_convert_repy.value = "Low quality images are scaled up by ({}, {}, {}) in ZYX to match high quality resolution".format(z,y,x)
+                text_convert_repy.value = "Low quality images are scaled up by ({}, {}, {}) in ZYX to match high quality resolution".format(*params["low_scaling"])
             
             BifCareInputConverter(in_dir =params["in_dir"],
                                   out_dir=params["out_dir"],
