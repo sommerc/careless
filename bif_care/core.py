@@ -176,12 +176,12 @@ class BifCareTrainer(object):
         x_out_size = int(x_size * self.low_scaling[2])
 
         if c_size != len(self.train_channels):
-            print("Warning: Number of Channels during training and prediction do not match. Using channels {} for prediction".format(self.train_channels))
+            print(" -- Warning: Number of Channels during training and prediction do not match. Using channels {} for prediction".format(self.train_channels))
         
         for ch in self.train_channels:
             model = CARE(None, 'CH_{}_model'.format(ch), basedir=pathlib.Path(self.out_dir) / 'models')
             res_image_ch = numpy.zeros(shape=(t_size, z_out_size, 1, y_out_size, x_out_size), dtype=dtype)
-            print("Predicting channel {}".format(ch))
+            print(" -- Predicting channel {}".format(ch))
             for t in tqdm(range(t_size), total=t_size):
                 img_3d = numpy.zeros((z_size, y_size, x_size), dtype=dtype)
                 for z in range(z_size):
@@ -201,17 +201,19 @@ class BifCareTrainer(object):
                 di = numpy.iinfo(dtype)
                 pred = pred.clip(di.min, di.max).astype(dtype)
 
+                res_image_ch[t, :, 0, :, :] = pred
+                
                 if False:
                     ch_t_out_fn = os.path.join(os.path.dirname(file_fn), os.path.splitext(os.path.basename(file_fn))[0] + "_care_predict_tp{:04d}_ch{}.tif".format(t, ch))
                     print("Saving time-point {} and channel {} to file '{}'".format(t, ch, ch_t_out_fn))
                     tifffile.imsave(ch_t_out_fn, pred[None,:, None, :, :], imagej=True, metadata={'axes': 'TZCYX'})
 
         
-                res_image_ch[t, :, 0, :, :] = pred
+                
             ch_out_fn = os.path.join(os.path.dirname(file_fn), 
                                      os.path.splitext(os.path.basename(file_fn))[0] 
                                      + "_care_predict_ch{}.tif".format(ch))
-            print("Saving channel {} CARE prediction to file '{}'".format(ch, ch_out_fn))
+            print(" -- Saving channel {} CARE prediction to file '{}'".format(ch, ch_out_fn))
 
             if keep_meta:
                 reso      = (1 / (pixel_reso.X / self.low_scaling[2]), 
