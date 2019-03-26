@@ -24,6 +24,7 @@ from .utils import JVM, get_file_list, get_pixel_dimensions, \
 
 class BifCareInputConverter(object):
     def __init__(self, **params): 
+        self.order = 0
         self.__dict__.update(**params)
 
     def _convert(self, conv_glob, conv_token, conv_scaling=None):
@@ -58,7 +59,7 @@ class BifCareInputConverter(object):
                 img_3d_ch = img_3d[:, c, :, :]
                 if conv_scaling:
                     img_3d_ch = rescale(img_3d_ch, conv_scaling, preserve_range=True, 
-                                        order=0, 
+                                        order=self.order, 
                                         multichannel=False,
                                         mode="reflect",
                                         anti_aliasing=True)
@@ -79,6 +80,7 @@ class BifCareInputConverter(object):
 
 class BifCareTrainer(object):
     def __init__(self, **params): 
+        self.order = 0
         self.__dict__.update(**params)    
 
     def create_patches(self):
@@ -155,6 +157,8 @@ class BifCareTrainer(object):
         JVM().start()
 
         pixel_reso = get_space_time_resolution(file_fn)
+        print("Prediction {}".format(file_fn))
+        print(" -- Using pixel sizes and frame interval", pixel_reso)
 
         ir = bf.ImageReader(file_fn)
         reader = ir.rdr
@@ -171,7 +175,8 @@ class BifCareTrainer(object):
         y_out_size = int(y_size * self.low_scaling[1])
         x_out_size = int(x_size * self.low_scaling[2])
 
-        assert c_size == len(self.train_channels), "Number of Channels during training and prediction do not match"    
+        if c_size != len(self.train_channels):
+            print("Warning: Number of Channels during training and prediction do not match. Using channels {} for prediction".format(self.train_channels))
         
         for ch in self.train_channels:
             model = CARE(None, 'CH_{}_model'.format(ch), basedir=pathlib.Path(self.out_dir) / 'models')
@@ -186,7 +191,7 @@ class BifCareTrainer(object):
                                                 t=t, rescale=False)
 
                 img_3d_ch_ex = rescale(img_3d, self.low_scaling, preserve_range=True, 
-                                        order=0, 
+                                        order=self.order, 
                                         multichannel=False,
                                         mode="reflect",
                                         anti_aliasing=True)
