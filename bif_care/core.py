@@ -123,7 +123,7 @@ class BifCareTrainer(object):
             plt.figure(figsize=(16,4))
             
             rand_sel = numpy.random.randint(low=0, high=len(X), size=6)
-            plot_some(X[rand_sel, 0],Y[rand_sel, 0],title_list=[range(6)])
+            plot_some(X[rand_sel, 0],Y[rand_sel, 0],title_list=[range(6)], cmap="gray")
         
             plt.show()
         
