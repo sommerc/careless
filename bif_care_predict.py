@@ -39,6 +39,7 @@ def main():
     print("Starting Care...")
     from bif_care import gui
     from bif_care.core import BifCareTrainer
+    from bif_care.utils import JVM
     
     print("Load project file")
     gui.params.load(args.p)
@@ -47,6 +48,9 @@ def main():
         bt = BifCareTrainer(**gui.params)
         bt.predict(fn, n_tiles=n_tiles)
 
+    JVM().shutdown()
+
 
 if __name__ == "__main__":
     main()
+    
