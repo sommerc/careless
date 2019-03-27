@@ -1,0 +1,8 @@
+
+*.pyc
+.ipynb_checkpoints/
+*.db
+*.tif
+*.WDBIIF011
+*.npz
+*.h5
