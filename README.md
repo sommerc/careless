@@ -9,7 +9,7 @@ Care needs paris of images - low and high quality. It learns how to convert low 
 * bioformats (Gohlke)
 * javabridge (Gohlke)
 * tifffile (Gohlke) 
-* PyQt5 (conda)
+* PyQt5 (conda) 
 * [nodejs](https://nodejs.org/en/)
 * [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/user_install.html) (conda + enabling)
 
