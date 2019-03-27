@@ -99,7 +99,8 @@ class BifCareTrainer(object):
 
     def create_patches(self):
         for ch in self.train_channels:
-            print("-- Creating patches for channel: {}".format(ch))
+            n_images = len(list((pathlib.Path(self.out_dir) / "train_data" / "raw" / "CH_{}".format(ch) / "GT").glob("*.tif")))
+            print("-- Creating {} patches for channel: {}".format(n_images*self.n_patches_per_image, ch))
             raw_data = RawData.from_folder (
                                     basepath    = pathlib.Path(self.out_dir) / "train_data" / "raw" / "CH_{}".format(ch),
                                     source_dirs = ['low'],
@@ -135,7 +136,7 @@ class BifCareTrainer(object):
             channels = self.train_channels
 
         for ch in channels:
-            print("-- Training channel {}".format(ch))
+            print("-- Training channel {}...".format(ch))
             (X,Y), (X_val,Y_val), axes = load_training_data(self.get_training_patch_path() / 'CH_{}_training_patches.npz'.format(ch), validation_split=0.1, verbose=False)
 
             c = axes_dict(axes)['C']
