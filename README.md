@@ -7,7 +7,7 @@ Care needs paris of images - low and high quality. It learns how to convert low 
 * tensorflow
 * tqdm (conda)
 * bioformats (Gohlke)
-* javabridge (Gohlke)
+* javabridge (Gohlke) 
 * tifffile (Gohlke) 
 * PyQt5 (conda) 
 * [nodejs](https://nodejs.org/en/)
