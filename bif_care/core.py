@@ -22,6 +22,9 @@ from csbdeep.models import Config, CARE
 from .utils import JVM, get_file_list, get_pixel_dimensions, \
                    get_upscale_factors, get_space_time_resolution
 
+import warnings
+warnings.filterwarnings("ignore")
+
 class BifCareInputConverter(object):
     def __init__(self, **params): 
         self.order = 0
