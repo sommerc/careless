@@ -11,7 +11,6 @@ from matplotlib import pyplot as plt
 from skimage.transform import rescale
 from tqdm import tqdm_notebook as tqdm
 
-
 import tensorflow as tf
 from csbdeep.utils import plot_some
 from csbdeep.models import Config, CARE
@@ -19,7 +18,6 @@ from csbdeep.io import load_training_data
 from csbdeep.utils.tf import limit_gpu_memory
 from csbdeep.data import RawData, create_patches
 from csbdeep.utils import axes_dict, plot_some, plot_history
-
 
 from .utils import JVM, get_file_list, get_pixel_dimensions, \
                    get_upscale_factors, get_space_time_resolution

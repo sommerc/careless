@@ -17,8 +17,6 @@ from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, \
 from matplotlib import pyplot as plt
 
 # global parameters
-
-
 class GuiParams(dict):
     _file = None
     def load(self, proj_fn):
@@ -48,14 +46,13 @@ class GuiParams(dict):
         self['train_epochs'] = 40
         self['train_steps_per_epoch'] = 100
         self['train_batch_size'] = 16
-
-
+        
 
 
 params = GuiParams()
 params.initialize()
 
-
+### GUI widgets
 def select_project():
     btn_new_proj = widgets.Button(description="New")
     btn_load_proj = widgets.Button(description="Load")
@@ -253,8 +250,6 @@ def select_patch_parameter():
     display(patch_parameter)
 
 
-
-
 ### Train parameter 
 ###################
 def select_train_paramter():
@@ -300,22 +295,6 @@ def select_train_paramter():
 
     display(train_parameter)
 
-# def select_project_():
-#     btn_project = widgets.Button(description="Select BifCare project (bif_care.json)")
-#     if "out_dir" in params.keys() and os.path.exists(os.path.join(params["out_dir"], "bif_care.json")):
-#         project_fn = os.path.join(params["out_dir"], "bif_care.json")
-#     else:
-#         project_fn = ""
-
-#     text_project_fn = widgets.Label(project_fn, layout={'border': '1px solid black', "width":"400px"})
-
-#     def btn_project_clicked(btn):
-#         project_fn = gui_fname()
-#         text_project_fn.value = project_fn
-
-#     btn_project.on_click(btn_project_clicked)       
-#     display(widgets.HBox([text_project_fn, btn_project]))
-#     return text_project_fn
 
 def select_file_to_predict(): 
     btn_predict_file = widgets.Button(description="Select file(s) for prediction")
