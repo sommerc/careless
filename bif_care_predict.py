@@ -5,7 +5,7 @@ import argparse
 
 
 
-description = """BIF-Care command line script for prediction"""
+description = """BIF-Care command line script for predicting new images given existing project."""
 
 def get_args():
     """
