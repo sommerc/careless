@@ -12,12 +12,14 @@ from skimage.transform import rescale
 from tqdm import tqdm_notebook as tqdm
 
 
+import tensorflow as tf
 from csbdeep.utils import plot_some
+from csbdeep.models import Config, CARE
+from csbdeep.io import load_training_data
+from csbdeep.utils.tf import limit_gpu_memory
 from csbdeep.data import RawData, create_patches
 from csbdeep.utils import axes_dict, plot_some, plot_history
-from csbdeep.utils.tf import limit_gpu_memory
-from csbdeep.io import load_training_data
-from csbdeep.models import Config, CARE
+
 
 from .utils import JVM, get_file_list, get_pixel_dimensions, \
                    get_upscale_factors, get_space_time_resolution
@@ -42,11 +44,13 @@ class BifCareInputConverter(object):
             if loci_pixel_type == 1:
                 # uint8
                 dtype = numpy.uint8
+                print(" -- Pixel-type 8-bit")
             elif loci_pixel_type == 3:
                 # uint16
                 dtype = numpy.uint16
+                print(" -- Pixel-type 16-bit")
             else:
-                print("Error: Pixel-type not supported. Pixel type must be 8- or 16-bit")
+                print(" -- Error: Pixel-type not supported. Pixel type must be 8- or 16-bit")
                 return
             
             series = 0 
@@ -150,8 +154,11 @@ class BifCareTrainer(object):
             model = CARE(config, 'CH_{}_model'.format(ch), basedir=pathlib.Path(self.out_dir) / 'models')
 
             # Show learning curve and example validation results
-            history = model.train(X,Y, validation_data=(X_val,Y_val))
-
+            try:
+                history = model.train(X,Y, validation_data=(X_val,Y_val))
+            except tf.errors.ResourceExhaustedError:
+                print("ResourceExhaustedError: Aborting...\n Training data too big for GPU. Are other GPU jobs running? Perhaps, reduce batch-size or patch-size?")
+                return
 
             #print(sorted(list(history.history.keys())))
             plt.figure(figsize=(16,5))
@@ -256,7 +263,7 @@ class BifCareTrainer(object):
                 tifffile.imsave(ch_out_fn, res_image_ch)
 
 
-        JVM().shutdown()
+        
 
 
 
