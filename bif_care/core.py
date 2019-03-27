@@ -256,4 +256,7 @@ class BifCareTrainer(object):
                 tifffile.imsave(ch_out_fn, res_image_ch)
 
 
+        JVM().shutdown()
+
+
 
