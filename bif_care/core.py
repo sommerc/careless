@@ -33,7 +33,18 @@ class BifCareInputConverter(object):
         for f_i, f_low in enumerate(tqdm(conversion_files)):
             ir = bf.ImageReader(str(f_low))
             reader = ir.rdr
-            dtype = numpy.uint16
+
+            loci_pixel_type = reader.getPixelType()
+
+            if loci_pixel_type == 1:
+                # uint8
+                dtype = numpy.uint8
+            elif loci_pixel_type == 3:
+                # uint16
+                dtype = numpy.uint16
+            else:
+                print("Error: Pixel-type not supported. Pixel type must be 8- or 16-bit")
+                return
             
             series = 0 
             z_size = reader.getSizeZ()
@@ -162,7 +173,18 @@ class BifCareTrainer(object):
 
         ir = bf.ImageReader(file_fn)
         reader = ir.rdr
-        dtype = numpy.uint16
+
+        loci_pixel_type = reader.getPixelType()
+
+        if loci_pixel_type == 1:
+            # uint8
+            dtype = numpy.uint8
+        elif loci_pixel_type == 3:
+            # uint16
+            dtype = numpy.uint16
+        else:
+            print("Error: Pixel-type not supported. Pixel type must be 8- or 16-bit")
+            return
         
         series = 0 
         z_size = reader.getSizeZ()
