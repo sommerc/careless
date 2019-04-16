@@ -305,7 +305,7 @@ def select_file_to_predict():
     def btn_predict_file_clicked(btn):
         predict_fn = gui_fnames()
         #print(predict_fn) 
-        text_predict_fn.value = predict_fn.replace(";", "\n")
+        text_predict_fn.value = predict_fn.replace(";", ";\n")
         
     
     btn_predict_file.on_click(btn_predict_file_clicked)       

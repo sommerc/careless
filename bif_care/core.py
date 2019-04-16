@@ -173,6 +173,11 @@ class BifCareTrainer(object):
 
             plt.show() 
 
+    def predict_multiple(self, file_fns, n_tiles=(1,4,4), keep_meta=True):
+        file_list = file_fns.split(";")
+        for file_fn in file_list:
+            self.predict(file_fn.strip(), n_tiles=n_tiles, keep_meta=keep_meta)
+
     def predict(self, file_fn, n_tiles=(1,4,4), keep_meta=True):
         JVM().start()
 
