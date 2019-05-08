@@ -265,6 +265,8 @@ class BifCareTrainer(object):
             else:
                 tifffile.imsave(ch_out_fn, res_image_ch)
 
+            res_image_ch = None # should trigger gc and free the memory
+
 
         
 
