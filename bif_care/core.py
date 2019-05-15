@@ -107,12 +107,12 @@ class BifCareTrainer(object):
                                     basepath    = pathlib.Path(self.out_dir) / "train_data" / "raw" / "CH_{}".format(ch),
                                     source_dirs = ['low'],
                                     target_dir  = 'GT',
-                                    axes        = 'ZYX',
+                                    axes        = 'YX',
                                     )
 
             X, Y, XY_axes = create_patches (
                 raw_data            = raw_data,
-                patch_size          = self.patch_size,
+                patch_size          = self.patch_size[1:],
                 n_patches_per_image = self.n_patches_per_image,
                 save_file           = self.get_training_patch_path() / 'CH_{}_training_patches.npz'.format(ch),
                 verbose             = False,
