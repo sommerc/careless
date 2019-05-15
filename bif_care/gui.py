@@ -230,7 +230,7 @@ def select_patch_parameter():
     ### Number of patches per image
     ###############################
 
-    dd_n_patch_per_img = widgets.Dropdown(options=[128, 256, 512, 1024, 2048, 4096],
+    dd_n_patch_per_img = widgets.BoundedIntText(min=1, max=4096,step=1,
                                           value=params['n_patches_per_image'])
 
     def on_n_patch_per_img_change(change):
