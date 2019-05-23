@@ -1,8 +1,13 @@
-
-*.pyc
 .ipynb_checkpoints/
+*.pyc
 *.db
 *.tif
 *.WDBIIF011
+*.WDBIIF016
+*.json
+*.ipynb
+*.png
 *.npz
 *.h5
+*.lnk
+*.zip
