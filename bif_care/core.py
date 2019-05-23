@@ -42,11 +42,9 @@ class BifCareInputConverter(object):
             if loci_pixel_type == 1:
                 # uint8
                 dtype = numpy.uint8
-                print(" -- Pixel-type 8-bit")
             elif loci_pixel_type == 3:
                 # uint16
                 dtype = numpy.uint16
-                print(" -- Pixel-type 16-bit")
             else:
                 print(" -- Error: Pixel-type not supported. Pixel type must be 8- or 16-bit")
                 return
@@ -107,12 +105,12 @@ class BifCareTrainer(object):
                                     basepath    = pathlib.Path(self.out_dir) / "train_data" / "raw" / "CH_{}".format(ch),
                                     source_dirs = ['low'],
                                     target_dir  = 'GT',
-                                    axes        = 'YX',
+                                    axes        = self.axes,
                                     )
 
             X, Y, XY_axes = create_patches (
                 raw_data            = raw_data,
-                patch_size          = self.patch_size[1:],
+                patch_size          = self.patch_size,
                 n_patches_per_image = self.n_patches_per_image,
                 save_file           = self.get_training_patch_path() / 'CH_{}_training_patches.npz'.format(ch),
                 verbose             = False,

@@ -40,6 +40,7 @@ class GuiParams(dict):
         self["out_dir"] = "."
         self["low_wc"] = ""
         self["high_wc"] = ""
+        self["axes"]   = "ZYX"
         self['patch_size'] = [16, 64, 64]
         self['n_patches_per_image'] = 128
         self["train_channels"] = [0]
@@ -159,6 +160,17 @@ def select_input():
         else:
             params["low_scaling"] = get_upscale_factors(params["in_dir"], params["low_wc"], params["high_wc"])
             
+            z_dim = get_pixel_dimensions(get_file_list(params["in_dir"], params["low_wc"])[0]).z
+
+            if z_dim == 1:
+                print("2d")
+                params["axes"] = "YX"
+            else:
+                print("3d")
+                params["axes"] = "ZYX"
+
+
+            
             if (numpy.array(params["low_scaling"]) == 1).all():
                 text_convert_repy.value = "Low quality images match high quality resolution"
             else:
@@ -209,8 +221,9 @@ def select_patch_parameter():
     ####################
     patch_size_select = []
     patch_options = [8, 16, 32, 64, 128, 256]
+
      
-    for j, a in enumerate(['Z', 'Y', 'X']):
+    for j, a in enumerate(list(params["axes"])):
         wi = widgets.Dropdown(options=list(map(str, patch_options)),
                             value=str(params['patch_size'][j]),
                             desciption=a,
