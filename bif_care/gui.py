@@ -208,7 +208,7 @@ def select_patch_parameter():
     ### Path size select
     ####################
     patch_size_select = []
-    patch_options = [8, 16, 32, 64, 128]
+    patch_options = [8, 16, 32, 64, 128, 256]
      
     for j, a in enumerate(['Z', 'Y', 'X']):
         wi = widgets.Dropdown(options=list(map(str, patch_options)),
@@ -255,7 +255,7 @@ def select_patch_parameter():
 def select_train_paramter():
     ### Training epochs
     ###################
-    int_train_epochs = widgets.IntSlider(value=params['train_epochs'], min=10, max=100, step=5,)
+    int_train_epochs = widgets.BoundedIntText(min=1, max=4096, step=1, value=params['train_epochs'])
     
     def on_int_train_epochs_change(change):
         params['train_epochs'] = change.new
@@ -264,7 +264,7 @@ def select_train_paramter():
 
     ### Steps per epoch
     ###################
-    int_train_steps_per_epoch = widgets.IntSlider(value=params['train_steps_per_epoch'], min=10, max=500, step=10,)
+    int_train_steps_per_epoch = widgets.BoundedIntText(min=1, max=4096, step=1, value=params['train_steps_per_epoch'])
     
     def on_train_steps_per_epoch_change(change):
         params['train_steps_per_epoch'] = change.new
@@ -274,7 +274,7 @@ def select_train_paramter():
     
     ### Batch size
     ##############
-    dd_train_batch_size = widgets.Dropdown(options=[8, 16, 32, 64, 128], value=params['train_batch_size']) 
+    dd_train_batch_size = widgets.Dropdown(options=[4, 8, 16, 32, 64, 128, 256], value=params['train_batch_size']) 
     
     def on_dd_train_batch_size_change(change):
         params['train_batch_size'] = change.new
