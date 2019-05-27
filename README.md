@@ -33,14 +33,16 @@ You can predict new images in the IPython notebook directly using the Prediction
 2. NVidia CUDA toolkit 10.0 + cuDNN 7.5.1
 
 ### Python dependencies
-We strongly recommend using the [Anaconda Python distribution](https://www.anaconda.com/distribution/) with Python >=3.6. You can install all mayor dependencies, including tensforflow (1.12.1) and csbdepp (0.3.0) by:
+We strongly recommend using the [Anaconda Python distribution](https://www.anaconda.com/distribution/) with Python == 3.6. Furthermore, we recommend to create a new conda virtual environment with `conda create -n py36_bif_care python=3.6 anaconda`.
+
+You can install all mayor dependencies, including tensforflow (1.12.1) and csbdepp (0.3.0) by:
 ```
 cd <this-path>
 pip install -r requirements.txt -e .
 ```
 If your Python distribution comes without PyQt5, install it by:
 ```
-conda install pyqt5
+conda install pyqt
 ```
 
 ### IPython widgets

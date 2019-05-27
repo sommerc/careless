@@ -7,6 +7,7 @@ matplotlib>=2.1.2
 tifffile>=2019.3.18
 widgetsnbextension>=3.4.2
 ipywidgets>=7.4.2
-tensorflow-gpu>=1.12.0
+tensorflow-gpu==1.12.0
 javabridge>=1.0.18
 python-bioformats>=1.5.2
+jupyterlab>=0.35.6
