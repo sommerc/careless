@@ -1,5 +1,6 @@
 # bif_care
 Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.com/) a toolbox for Content-aware Image Restoration.
+
 ## How to use:
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
@@ -36,11 +37,14 @@ You can predict new images in the IPython notebook directly using the Prediction
 We strongly recommend using the [Anaconda Python distribution](https://www.anaconda.com/distribution/) with Python == 3.6. Furthermore, we recommend to create a new conda virtual environment with `conda create -n py36_bif_care python=3.6 anaconda`.
 
 You can install all mayor dependencies, including tensforflow (1.12.1) and csbdepp (0.3.0) by:
+
 ```
 cd <this-path>
 pip install -r requirements.txt -e .
 ```
+
 If your Python distribution comes without PyQt5, install it by:
+
 ```
 conda install pyqt
 ```
@@ -48,26 +52,20 @@ conda install pyqt
 ### IPython widgets
 The user interface is written using IPython/Jupyter widgets, which requires the installation of [node.js]([nodejs](https://nodejs.org/en/))
 
-Finally, you have to enable the IPython widgets, and install the for Jupyter-lab
+Finally, you have install jypyter widgets and enable them:
+
 ```
-jupyter nbextension enable --py widgetsnbextension
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
+jupyter nbextension enable --py widgetsnbextension
+
 ```
-
-More information on [IPython widgets](https://ipywidgets.readthedocs.io/en/stable/user_install.html).
-
+More information on [Jupyter/IPython widgets](https://ipywidgets.readthedocs.io/en/stable/user_install.html).
 
 
+### Troubleshooting and known issues
+* tensorflow 1.13.x does not work yet with current latest csbdeep 0.3.0 release.
+* ...
 
 
-## Base requirments
-* tensorflow
-* tqdm (conda)
-* bioformats (Gohlke)
-* javabridge (Gohlke) 
-* tifffile (Gohlke) 
-* PyQt5 (conda) 
-* [nodejs](https://nodejs.org/en/)
-* [ipywidgets](https://ipywidgets.readthedocs.io/en/stable/user_install.html) (conda + enabling)
 
 
