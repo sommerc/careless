@@ -1,0 +1,12 @@
+csbdeep==0.3.0
+tqdm>=4.23.4
+scipy>=1.2.0
+scikit_image>=0.13.1
+numpy>=1.14.2
+matplotlib>=2.1.2
+tifffile>=2019.3.18
+widgetsnbextension>=3.4.2
+ipywidgets>=7.4.2
+tensorflow-gpu>=1.12.0
+javabridge>=1.0.18
+python-bioformats>=1.5.2

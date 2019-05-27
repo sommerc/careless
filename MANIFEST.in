@@ -1,0 +1,6 @@
+include README.md
+include requirements.txt
+include bif_care_predict.py
+include bif_care_templ.ipynb
+include .gitignore
+
