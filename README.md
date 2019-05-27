@@ -9,6 +9,9 @@ In order to train CARE the path to the image pairs needs to be specified. Then, 
 #### Training the network
 The training of a neural network is done iteratively in `epochs`. In each epoch the network weights' are updated by optimizing a loss function of `steps_per_epoch` batches of image patches. The size of this batches are given by `batch_size`. To make use of all your image data, select `steps_per_epoch = #patches / batch_szie`. Per default, 10% of patches are used for validation and not used in training.
 
+#### Vanilla screencast for input selection and training
+![bif_care User interface](vid/bif_care_demo_01.mp4)
+
 ## Installation
 
 ### NVidia Cuda and cuDNN
