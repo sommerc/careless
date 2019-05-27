@@ -54,33 +54,38 @@ class BifCareInputConverter(object):
             y_size = reader.getSizeY()
             x_size = reader.getSizeX()
             c_size = reader.getSizeC()
+
+            t_size = reader.getSizeT()
+
+            for t in range(t_size):
             
-            img_3d = numpy.zeros((z_size, c_size, y_size, x_size), dtype=dtype)
-            for z in range(z_size):
+                img_3d = numpy.zeros((z_size, c_size, y_size, x_size), dtype=dtype)
+                for z in range(z_size):
+                    for c in range(c_size):
+                        img_3d[z, c, :, :] = ir.read(series=series,
+                                                    z=z,
+                                                    t=t,
+                                                    c=c, rescale=False)
+
+                tmp_dir = pathlib.Path(self.out_dir) / "train_data" / "raw"
+                
                 for c in range(c_size):
-                    img_3d[z, c, :, :] = ir.read(series=series,
-                                                z=z,
-                                                c=c, rescale=False)
+                    low_dir = tmp_dir / "CH_{}".format(c) / conv_token
+                    low_dir.mkdir(parents=True, exist_ok=True)
+                    
+                    out_tif = low_dir / "training_file_{:04d}_t{:04d}.tif".format(f_i, t)
+                    
+                    img_3d_ch = img_3d[:, c, :, :]
+                    if conv_scaling:
+                        img_3d_ch = rescale(img_3d_ch, conv_scaling, preserve_range=True, 
+                                            order=self.order, 
+                                            multichannel=False,
+                                            mode="reflect",
+                                            anti_aliasing=True)
 
-            tmp_dir = pathlib.Path(self.out_dir) / "train_data" / "raw"
-            
-            for c in range(c_size):
-                low_dir = tmp_dir / "CH_{}".format(c) / conv_token
-                low_dir.mkdir(parents=True, exist_ok=True)
-                
-                out_tif = low_dir / "training_file_{:04d}.tif".format(f_i)
-                
-                img_3d_ch = img_3d[:, c, :, :]
-                if conv_scaling:
-                    img_3d_ch = rescale(img_3d_ch, conv_scaling, preserve_range=True, 
-                                        order=self.order, 
-                                        multichannel=False,
-                                        mode="reflect",
-                                        anti_aliasing=True)
-
-                tifffile.imsave(out_tif, img_3d_ch[:, None, :, :].astype(dtype), 
-                                imagej=True,
-                                metadata={'axes': 'ZCYX'})
+                    tifffile.imsave(out_tif, img_3d_ch[:, None, :, :].astype(dtype), 
+                                    imagej=True,
+                                    metadata={'axes': 'ZCYX'})
             ir.close()
 
 
