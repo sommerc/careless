@@ -1,7 +1,6 @@
 import re
 from setuptools import setup
  
- 
 with open("README.md", "rb") as f:
     description = f.read().decode("utf-8")
 

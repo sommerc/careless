@@ -5,12 +5,12 @@ Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.c
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
 #### Input selection and patch extraction
-1. Copy and rename the IPython notebook template file: `bif_care_templ.ipynb`
-2. Open your renamed `bif_care_templ.ipynb` file in Jypyter or IPyhton notebook
-3. In order to train CARE the path to the image pairs needs to be specified. Then, choose images for low and high quality respectively using a wild-card (e.g. `low*.tif` and `high*.tif`). The images will be converted and image patches are extracted. This step is required for efficient GPU execution. Choose patch sizes for your input dimensions `(Z)YX` and set how many patches should be extracted per image pair. After image patches have been extracted, they are saved to the output directory. 
+1. Copy and rename the IPython notebook template file: `bif_care_templ.ipynb` to `my_care_project.ipynb`
+2. Open your renamed `my_care_project.ipynb` file in Jypyter or IPyhton notebook.
+3. In order to train CARE, the path to the image pairs needs to be specified. Then, choose images for low and high quality respectively using a wild-card (e.g. `low*.tif` and `high*.tif`). The images will be converted and image patches are extracted. This step is required for efficient GPU execution. Choose patch sizes for your input dimensions `(Z)YX` and set how many patches should be extracted per image pair. After image patches have been extracted, they are saved to the output directory. 
 
 #### Training the network
-The training of a neural network is done iteratively in `epochs`. In each epoch the network weights' are updated by optimizing a loss function of `steps_per_epoch` batches of image patches. The size of the batches is given by `batch_size`. To make use of all your image data, select `steps_per_epoch = #patches / batch_szie`. Per default, 10% of patches are used for validation and not used in training.
+The training of a neural network is done iteratively in `epochs`. In each epoch, the network weights' are updated by optimizing a loss function on `steps_per_epoch` batches of image patches. The size of the batches is given by `batch_size`. To make use of all your image data, select `steps_per_epoch = #patches / batch_size`. Per default, 10% of patches are used for validation and not used in training.
 
 4. Select training parameters and execute training code block.
 
@@ -63,7 +63,7 @@ More information on [Jupyter/IPython widgets](https://ipywidgets.readthedocs.io/
 
 
 ### Troubleshooting and known issues
-* tensorflow 1.13.x does not work yet with current latest csbdeep 0.3.0 release.
+* tensorflow 1.13.x does not work yet with (currently) latest csbdeep 0.3.0 release. This makes it currently only working on Python 3.6
 * ...
 
 
