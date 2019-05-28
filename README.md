@@ -54,7 +54,7 @@ conda install pyqt
 ### IPython widgets
 The user interface is written using IPython/Jupyter widgets, which requires the installation of [node.js]([nodejs](https://nodejs.org/en/))
 
-Finally, you have install jypyter widgets and enable them:
+Finally, you have to install jypyter widgets and enable them, by:
 
 ```
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
@@ -65,8 +65,8 @@ More information on [Jupyter/IPython widgets](https://ipywidgets.readthedocs.io/
 
 
 ### Troubleshooting and known issues
-* tensorflow 1.13.x does not work yet with (currently) latest csbdeep 0.3.0 release. This makes it currently only working on Python 3.6
-* ...
+* tensorflow 1.13.x requires NVidia tookit 10.0 (or higher; not tested) for the latest csbdeep 0.3.0 release. 
+* 
 
 
 
