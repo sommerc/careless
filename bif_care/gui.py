@@ -168,7 +168,7 @@ def select_input():
                 
                 params["axes"] = "ZYX"
 
-            print("Using CARE in {}-dimension mode".format(len(params["axes"])))
+            print("Using CARE in {}D mode".format(len(params["axes"])))
             
             if (numpy.array(params["low_scaling"]) == 1).all():
                 text_convert_repy.value = "Low quality images match high quality resolution"

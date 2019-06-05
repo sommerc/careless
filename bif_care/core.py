@@ -26,6 +26,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 tf.logging.set_verbosity(tf.logging.ERROR)
+if type(tf.contrib) != type(tf): tf.contrib._warning = None
 
 class BifCareInputConverter(object):
     def __init__(self, **params): 
