@@ -163,13 +163,12 @@ def select_input():
             z_dim = get_pixel_dimensions(get_file_list(params["in_dir"], params["low_wc"])[0]).z
 
             if z_dim == 1:
-                print("2d")
                 params["axes"] = "YX"
             else:
-                print("3d")
+                
                 params["axes"] = "ZYX"
 
-
+            print("Using CARE in {}-dimension mode".format(len(params["axes"])))
             
             if (numpy.array(params["low_scaling"]) == 1).all():
                 text_convert_repy.value = "Low quality images match high quality resolution"
