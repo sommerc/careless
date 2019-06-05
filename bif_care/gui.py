@@ -41,7 +41,7 @@ class GuiParams(dict):
         self["low_wc"] = ""
         self["high_wc"] = ""
         self["axes"]   = "ZYX"
-        self['patch_size'] = [16, 64, 64]
+        self['patch_size'] = []
         self['n_patches_per_image'] = 128
         self["train_channels"] = [0]
         self['train_epochs'] = 40
@@ -220,6 +220,8 @@ def select_patch_parameter():
     ####################
     patch_size_select = []
     patch_options = [8, 16, 32, 64, 128, 256]
+
+    params['patch_size'] = [64]*len(list(params["axes"]))
 
      
     for j, a in enumerate(list(params["axes"])):
