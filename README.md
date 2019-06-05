@@ -31,9 +31,11 @@ You can predict new images in the IPython notebook directly using the prediction
 1. Install [NVidia CUDA toolkit](https://developer.nvidia.com/cuda-toolkit-archive)
 2. Install [NVidia cuDNN](https://developer.nvidia.com/cudnn)
 
+The installation of the CUDA toolkit is straight-forward. To download cuDNN you have to create a Developer account at NVidia. After downloading integrate the folders `bin`, `include` and `lib` into the according folders of your CUDA toolkit installation.
+
 #### Known working versions
 1. NVidia CUDA toolkit  9.0 + cuDNN 7.3.0
-2. NVidia CUDA toolkit 10.0 + cuDNN 7.5.1
+2. NVidia CUDA toolkit 10.0 + cuDNN 7.5.1 (recommended)
 
 ### Python dependencies
 We strongly recommend using the [Anaconda Python distribution](https://www.anaconda.com/distribution/) with Python == 3.6. Furthermore, we recommend to create a new conda virtual environment with `conda create -n py36_bif_care python=3.6 anaconda`.
@@ -65,8 +67,13 @@ More information on [Jupyter/IPython widgets](https://ipywidgets.readthedocs.io/
 
 
 ### Troubleshooting and known issues
-* tensorflow 1.13.x requires NVidia tookit 10.0 (or higher; not tested) for the latest csbdeep 0.3.0 release. 
-* 
+* tensorflow 1.13.x requires NVidia tookit 10.0 for the latest csbdeep 0.3.0 release. 
+* Currently NVidia toolkit 10.1 is not supported by the latest tensorflow==13.1 release
+* To install bioformats/ javabridge you need the Microsoft Visual Studio compiler runtime 2015 (14.0) installed, which is included with Microsoft Visual Studio community edition >=2017
+* To install bioformats/ javabridge you need Java SDK 8 (1.8) or download [pre-compiled .whl](https://www.lfd.uci.edu/~gohlke/pythonlibs/) packages and install them by:
+
+    `pip install <javabridge>.whl` and `pip install <bioformats>.whl`
+
 
 
 
