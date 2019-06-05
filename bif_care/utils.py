@@ -145,10 +145,6 @@ def check_file_lists(in_dir, low_wc, high_wc):
            (dim_low.z > dim_high.z):
            return False, "Low quality images have higher spatial resolution"
 
-        if (dim_low.t > dim_low.z) and \
-            (dim_low.z == 1):
-            return False, "Only 1 z-slice in '{}' but {} frames. Make sure input images are Z-stacks.".format(fl, dim_low.t)
-
     return True, "OK"
 
 
