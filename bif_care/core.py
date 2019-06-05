@@ -25,6 +25,8 @@ from .utils import JVM, get_file_list, get_pixel_dimensions, \
 import warnings
 warnings.filterwarnings("ignore")
 
+tf.logging.set_verbosity(tf.logging.ERROR)
+
 class BifCareInputConverter(object):
     def __init__(self, **params): 
         self.order = 0
