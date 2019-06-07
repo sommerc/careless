@@ -35,8 +35,8 @@ You can predict new images in the IPython notebook directly using the prediction
 The installation of the CUDA toolkit is straight-forward. To download cuDNN you have to create a Developer account at NVidia. After downloading integrate the folders `bin`, `include` and `lib` into the according folders of your CUDA toolkit installation.
 
 #### Known working versions
-1. NVidia CUDA toolkit  9.0 + cuDNN 7.3.0
-2. NVidia CUDA toolkit 10.0 + cuDNN 7.5.1 (recommended)
+1. NVidia CUDA toolkit  9.0 + cuDNN 7.3.0 + tensorflow 12.0
+2. NVidia CUDA toolkit 10.0 + cuDNN 7.5.1 + tensorflow 13.1 (recommended)
 
 ### Python dependencies
 We strongly recommend using the [Anaconda Python distribution](https://www.anaconda.com/distribution/) with Python == 3.6. Furthermore, we recommend to create a new conda virtual environment with `conda create -n py36_bif_care python=3.6 anaconda`.
