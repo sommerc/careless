@@ -1,7 +1,7 @@
 csbdeep==0.3.0
 tqdm>=4.23.4
 scipy>=1.2.0
-scikit_image>=0.15.0
+scikit_image>=0.14.2
 numpy>=1.14.2
 matplotlib>=2.1.2
 tifffile>=2019.3.18
