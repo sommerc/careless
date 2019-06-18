@@ -4,6 +4,9 @@ Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.c
 ## How to use:
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
+#### Vanilla screencast for input selection and training
+![bif_care User interface](vid/bif_care_demo_01.mp4
+
 #### Input selection and patch extraction
 0. Clone this repository with `git clone https://....`
 1. Copy and rename the IPython notebook template file: `bif_care_templ.ipynb` to `my_care_project.ipynb`
@@ -34,9 +37,6 @@ You can predict new images in the IPython notebook directly using the prediction
 2. In Fiji choose `Plugins->CSBDeep->Run your network`
 3. Select network file `<bif_care-out-folder>/models/CH_X_model/TF_SavedModel.zip` as 'Import model (.zip)' of your trained channel
 4. Set additional parameters such as number of tiles (higher number, in case your entire image cannot be loaded on your GPU memory) and press OK
-
-#### Vanilla screencast for input selection and training
-![bif_care User interface](vid/bif_care_demo_01.mp4)
 
 ## Installation
 ### NVidia Cuda and cuDNN
