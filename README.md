@@ -15,6 +15,17 @@ The training of a neural network is done iteratively in `epochs`. In each epoch,
 
 4. Select training parameters and execute training code block.
 
+#### Seting up Fiji for prediction with CARE models
+Using Tensorflow 1.12.0 / NVidia toolkit 9.0
+1. Use the Fiji [CSBDeep](http://sites.imagej.net/CSBDeep/) update site
+
+Using Tensorflow 1.13.1 / NVidia toolkit 10.0
+1. get libtensorflow-1.13.1.jar and [tensorflow_jni.dll](https://www.tensorflow.org/install/lang_java)
+2. put libtensorflow_jni-1.13.1.jar into "Fiji.app\jar\"
+3. put tensorflow_jni.dll into folder "Fiji.app\lib\win64\"
+
+Restart Fiji
+
 #### Using the trained network for prediction
 You can predict new images in the IPython notebook directly using the prediction widgets, or use the Fiji:
 
@@ -65,6 +76,13 @@ jupyter nbextension enable --py widgetsnbextension
 
 ```
 More information on [Jupyter/IPython widgets](https://ipywidgets.readthedocs.io/en/stable/user_install.html).
+
+### Example data
+The authors of [CARE](https://github.com/CSBDeep/CSBDeep/tree/master/examples) provide example data from different modalities.
+
+* [3D denoising](http://csbdeep.bioimagecomputing.com/example_data/tribolium.zip)
+
+Unzip, copy and rename (e. g. *_low.tif*, *_high.tif*) the images form `low` and `GT` into a single folder.
 
 
 ### Troubleshooting and known issues
