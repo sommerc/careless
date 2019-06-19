@@ -24,14 +24,14 @@ class GuiParams(dict):
             params = json.load(read_file)
             for k, v in params.items():
                 self[k] = v
-        GuiParams._file = proj_fn
+        self.__class__._file = proj_fn
 
     def saveas(self, proj_fn):
-        GuiParams._file = proj_fn
+        self.__class__._file = proj_fn
         self.save()
         
     def save(self):
-        with open(GuiParams._file, "w") as save_file:
+        with open(self.__class__._file, "w") as save_file:
             json.dump(self, save_file)
 
     def initialize(self):
@@ -54,7 +54,7 @@ params = GuiParams()
 params.initialize()
 
 ### GUI widgets
-def select_project():
+def select_project(default_name="./bif_care.json", params=params):
     btn_new_proj = widgets.Button(description="New")
     btn_load_proj = widgets.Button(description="Load")
 
@@ -62,7 +62,7 @@ def select_project():
 
     @out_project.capture(clear_output=True, wait=True)
     def btn_btn_new_proj_clicked(btn):
-        new_proj_fn = gui_fsavename("./bif_care.json")
+        new_proj_fn = gui_fsavename(default_name)
         if len(new_proj_fn) == 0:
             return
         params.initialize()
@@ -266,7 +266,7 @@ def select_patch_parameter():
 
 ### Train parameter 
 ###################
-def select_train_paramter():
+def select_train_paramter(params=params):
     ### Training epochs
     ###################
     int_train_epochs = widgets.BoundedIntText(min=1, max=4096, step=1, value=params['train_epochs'])
