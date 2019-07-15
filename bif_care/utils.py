@@ -201,9 +201,10 @@ class BFListReader(object):
         res = []
         for fn in self.img_fns:
             dims = get_pixel_dimensions(fn)
+            print("  -- ", fn, dims)
 
             ir = bf.ImageReader(str(fn))
-            
+
             for t in range(dims.t):
                 img = numpy.zeros((dims.t, dims.z, dims.y, dims.x, dims.c), numpy.float32)
                 for z in range(dims.z):
@@ -213,9 +214,9 @@ class BFListReader(object):
                                                     c=c, 
                                                     t=t, rescale=False)
 
-                if "Z" not in axes:
-                    img = img[:, 0, ...] 
-                res.append(img)
+            if "Z" not in axes:
+                img = img[:, 0, ...] 
+            res.append(img)
             ir.close()
         return res
 
