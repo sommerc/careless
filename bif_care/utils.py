@@ -1,5 +1,6 @@
 import os
 import re
+import numpy
 import pathlib
 import javabridge as jv
 import bioformats as bf
@@ -45,11 +46,7 @@ def get_space_time_resolution(img_path):
         Y_res_unit = "micron"
 
     if '\xb5' in Z_res_unit:
-        Z_res_unit = "micron"
-
-    
-    
-        
+        Z_res_unit = "micron"  
 
     i.Pixels.get_PhysicalSizeZUnit()
     
@@ -148,14 +145,6 @@ def check_file_lists(in_dir, low_wc, high_wc):
     return True, "OK"
 
 
-
-
-    
-
-
-
-
-
 def get_upscale_factors(in_dir, low_wc, high_wc): 
     low_fl = get_file_list(in_dir, low_wc)
     high_fl = get_file_list(in_dir, high_wc)        
@@ -166,4 +155,74 @@ def get_upscale_factors(in_dir, low_wc, high_wc):
     return (high_dim.z / low_dim.z,
             high_dim.y / low_dim.y,
             high_dim.x / low_dim.x)
+
+
+
+class BFListReader(object):
+    def __init__(self, path, glob_flt):
+        self.path = path
+        self.glob_flt = glob_flt
+
+        self.img_fns = self.get_file_list()
+
+    def get_file_list(self):
+        assert os.path.exists(self.path), "Input folder '{}' does not exist".format(self.path)
+        return sorted(list( pathlib.Path(self.path).glob(self.glob_flt)))
+
+    def get_axes(self, img_fn):
+        res = ""
+        dims = get_pixel_dimensions(img_fn)
+        if dims.t > 1:
+            res+="T"
+        if dims.c > 1:
+            res+="C"
+        if dims.z > 1:
+            res+="Z"
+
+        res+="YX"
+        return res
+
+    def check_dims_equal(self):
+        dims = []
+        for fn in self.img_fns:
+            dim = self.get_axes(fn)
+            dims.append(dim)
+
+        print(dims)
+
+        assert dims.count(dims[0]) == len(dims), "Dimensions of image files do not match"
+
+        self.axes = dims[0]
+        return dims[0]
+
+    def load_imgs(self):
+        axes = self.check_dims_equal()
+
+        res = []
+        for fn in self.img_fns:
+            dims = get_pixel_dimensions(fn)
+
+            ir = bf.ImageReader(str(fn))
+            
+            for t in range(dims.t):
+                img = numpy.zeros((dims.t, dims.z, dims.y, dims.x, dims.c), numpy.float32)
+                for z in range(dims.z):
+                    for c in range(dims.c):
+                        img[t, z, :, :, c] = ir.read(series=0,
+                                                    z=z,
+                                                    c=c, 
+                                                    t=t, rescale=False)
+
+                if "Z" not in axes:
+                    img = img[:, 0, ...] 
+                res.append(img)
+            ir.close()
+        return res
+
+
+
+
+
+
+
 
