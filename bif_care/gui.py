@@ -221,8 +221,8 @@ def select_patch_parameter():
     patch_size_select = []
     patch_options = [8, 16, 32, 64, 128, 256]
 
-    params['patch_size'] = [64]*len(list(params["axes"]))
-
+    if len(params['patch_size']) == 0:
+        params['patch_size'] = [64]*len(list(params["axes"]))
      
     for j, a in enumerate(list(params["axes"])):
         wi = widgets.Dropdown(options=list(map(str, patch_options)),
