@@ -188,8 +188,6 @@ class BFListReader(object):
             dim = self.get_axes(fn)
             dims.append(dim)
 
-        print(dims)
-
         assert dims.count(dims[0]) == len(dims), "Dimensions of image files do not match"
 
         self.axes = dims[0]
