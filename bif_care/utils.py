@@ -203,8 +203,8 @@ class BFListReader(object):
 
             ir = bf.ImageReader(str(fn))
 
+            img = numpy.zeros((dims.t, dims.z, dims.y, dims.x, dims.c), numpy.float32)
             for t in range(dims.t):
-                img = numpy.zeros((dims.t, dims.z, dims.y, dims.x, dims.c), numpy.float32)
                 for z in range(dims.z):
                     for c in range(dims.c):
                         img[t, z, :, :, c] = ir.read(series=0,

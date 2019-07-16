@@ -38,7 +38,7 @@ class GuiParamsN2V(GuiParams):
 params = GuiParamsN2V()
 params.initialize()
 
-params.load("H:/projects/024_care_bif/n2v/test_CTYX/bif_n2v.json")
+#params.load("H:/projects/024_care_bif/n2v/test_CTYX/bif_n2v.json")
 
 select_project = partial(select_project, default_name='./bif_n2v.json', params=params)
 select_train_paramter = partial(select_train_paramter, params=params)
@@ -253,7 +253,6 @@ def train_predict(n_tiles=(1,4,4), params=params):
     print("Loading images ...")
     imgs = datagen.load_imgs()
 
-
     print("Training ...")
     for c in params["train_channels"]:
         print("  -- Channel {}".format(c))
@@ -314,9 +313,7 @@ def train_predict(n_tiles=(1,4,4), params=params):
             res_img = []
             for t in range(len(im)):
                 nt = n_tiles if "Z" in params["axes"] else n_tiles[1:]
-                print("im   .shape", im.shape)
                 pred = model.predict(im[t,..., 0], axes=params["axes"], n_tiles=nt)
-                print("pred.shape", pred.shape)
 
                 if "Z" in params["axes"]:
                     pred = pred[:, None, ...]
