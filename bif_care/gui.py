@@ -256,9 +256,9 @@ def select_patch_parameter():
 
 
     patch_parameter = widgets.VBox(
-                               [widgets.HBox([widgets.Label('Channels', layout={'width':'100px'}), ms_channel]), 
-                                widgets.HBox([widgets.Label('Patch size', layout={'width':'100px'}), patch_size_select]), 
-                                widgets.HBox([widgets.Label('#Patches / image', layout={'width':'100px'}), dd_n_patch_per_img]),
+                               [widgets.HBox([widgets.Label('Channels', layout={'width':'200px'}), ms_channel]), 
+                                widgets.HBox([widgets.Label('Patch size', layout={'width':'200px'}), patch_size_select]), 
+                                widgets.HBox([widgets.Label('#Patches / image', layout={'width':'200px'}), dd_n_patch_per_img]),
                                 ])
 
     display(patch_parameter)
@@ -301,9 +301,9 @@ def select_train_paramter(params=params):
     ##############
     train_parameter = widgets.VBox(
                                [
-                                widgets.HBox([widgets.Label('#Epochs', layout={'width':'100px'}), int_train_epochs]),
-                                widgets.HBox([widgets.Label('#Steps / epoch', layout={'width':'100px'}), int_train_steps_per_epoch]),
-                                widgets.HBox([widgets.Label('Batch size', layout={'width':'100px'}), dd_train_batch_size]),
+                                widgets.HBox([widgets.Label('#Epochs', layout={'width':'200px'}), int_train_epochs]),
+                                widgets.HBox([widgets.Label('#Steps / epoch', layout={'width':'200px'}), int_train_steps_per_epoch]),
+                                widgets.HBox([widgets.Label('Batch size', layout={'width':'200px'}), dd_train_batch_size]),
                                 
                                 ])
 
