@@ -7,14 +7,14 @@ import tifffile
 import ipywidgets as widgets
 from functools import partial
 from IPython.display import display
-
+from bif_care.utils import BFListReader
 
 from bif_care.qt_file_dialog import gui_fname
 from bif_care.qt_dir_dialog import gui_dirname
 from bif_care.qt_files_dialog import gui_fnames
 from bif_care.qt_filesave_dialog import gui_fsavename
-from bif_care.gui import GuiParams, select_project, select_train_paramter
 from bif_care.utils import get_pixel_dimensions, get_space_time_resolution, get_file_list
+from bif_care.gui import GuiParams, select_project, select_train_paramter, select_file_to_predict
 
 class GuiParamsN2V(GuiParams):
     def initialize(self):
@@ -34,11 +34,10 @@ class GuiParamsN2V(GuiParams):
         self['n2v_neighborhood_radius'] = 5
         self['augment'] = False
         
-
 params = GuiParamsN2V()
 params.initialize()
 
-#params.load("H:/projects/024_care_bif/n2v/test_CTYX/bif_n2v.json")
+#params.load("H:/projects/024_care_bif/n2v/test_TCZYX/bif_n2v.json")
 
 select_project = partial(select_project, default_name='./bif_n2v.json', params=params)
 select_train_paramter = partial(select_train_paramter, params=params)
@@ -99,8 +98,16 @@ def select_input(params=params):
     @out_convert.capture(clear_output=True, wait=True)
     def btn_convert_clicked(btn):
         text_convert_repy.value = "Checking..."
-        ###TODO Check
+        
+        datagen = BFListReader()
+        datagen.from_glob(params["in_dir"], params["glob"])
+        
         check_ok, msg = True, "OK"
+        try:
+            datagen.check_dims_equal()
+        except AssertionError as ae:
+            check_ok, msg = False, str(ae)
+
         if not check_ok: 
             text_convert_repy.value = msg
         else:
@@ -246,11 +253,13 @@ def train_predict(n_tiles=(1,4,4), params=params):
     from n2v.utils.n2v_utils import manipulate_val_data
     from n2v.internals.N2V_DataGenerator import N2V_DataGenerator
     from matplotlib import pyplot as plt
-    from bif_care.utils import BFListReader
+    
     np = numpy
 
-    datagen = BFListReader(params["in_dir"], params["glob"])
-    files = datagen.img_fns
+    # Init reader
+    datagen = BFListReader()
+    datagen.from_glob(params["in_dir"], params["glob"])
+    files = datagen.get_file_names()
 
     print("Loading images ...")
     imgs = datagen.load_imgs()
@@ -334,3 +343,58 @@ def train_predict(n_tiles=(1,4,4), params=params):
                                                                                                 'finterval': finterval,
                                                                                                 'spacing'  : spacing, 
                                                                                                 'unit'     : unit})
+
+
+def predict(files, n_tiles=(1,4,4), params=params):
+    from n2v.models import N2V
+    from bif_care.utils import BFListReader
+
+    files = [f.strip() for f in files.split(";")]
+    datagen = BFListReader()
+    datagen.from_file_list(files)
+
+    axes = datagen.check_dims_equal()
+    axes = axes.replace("T", "").replace("C","")
+
+    assert axes == params["axes"], "The files to predict have different dimensionality: {} != {}".format(axes, params["axes"])
+
+    imgs = datagen.load_imgs()
+
+    print("Predicting ...")
+    for c in params["train_channels"]:
+        print("  -- Channel {}".format(c))
+
+        img_ch = [im[..., c:c+1] for im in imgs]
+        # a name used to identify the model
+        model_name = '{}_ch{}'.format(params['name'], c)
+        # We are now creating our network model.
+        model = N2V(config=None, name=model_name, basedir=params["in_dir"])
+
+        for f, im in zip(files, img_ch):
+            print("  -- {}".format(f))
+            pixel_reso = get_space_time_resolution(str(f))
+            res_img = []
+            for t in range(len(im)):
+                nt = n_tiles if "Z" in params["axes"] else n_tiles[1:]
+                pred = model.predict(im[t,..., 0], axes=params["axes"], n_tiles=nt)
+
+                if "Z" in params["axes"]:
+                    pred = pred[:, None, ...]
+                res_img.append(pred)
+
+            pred = numpy.stack(res_img)
+            if "Z" not in params["axes"]:
+                    pred = pred[:, None,     None, ...]
+
+            reso      = (1 / pixel_reso.X, 1 / pixel_reso.Y )
+            spacing   = pixel_reso.Z
+            unit      = pixel_reso.Xunit
+            finterval = pixel_reso.T
+
+            tifffile.imsave("{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c), pred, imagej=True, resolution=reso, metadata={'axes': 'TZCYX',
+                                                                                                'finterval': finterval,
+                                                                                                'spacing'  : spacing, 
+                                                                                                'unit'     : unit})
+
+
+    
