@@ -68,6 +68,7 @@ def select_project(default_name="./bif_care.json", params=params):
         params.initialize()
         params.saveas(new_proj_fn)
         print("New project initialized: '{}'".format(new_proj_fn))
+        params["name"] = os.path.splitext( os.path.basename(new_proj_fn))[0]
     btn_new_proj.on_click(btn_btn_new_proj_clicked)   
 
     @out_project.capture(clear_output=True, wait=True)
