@@ -104,8 +104,8 @@ def select_input(params=params):
         if not check_ok: 
             text_convert_repy.value = msg
         else:
-
-            z_dim = get_pixel_dimensions(get_file_list(params["in_dir"], params["glob"])[0]).z
+            pix_dim = get_pixel_dimensions(get_file_list(params["in_dir"], params["glob"])[0])
+            z_dim = pix_dim.z
 
             if z_dim == 1:
                 params["axes"] = "YX"
@@ -113,7 +113,9 @@ def select_input(params=params):
                 
                 params["axes"] = "ZYX"
 
-            text_convert_repy.value = "Using CARE in {}D mode".format(len(params["axes"]))
+            params["train_channels"] = list(range(pix_dim.c))
+
+            text_convert_repy.value = "Using Noise2void in {}D mode with {} channels".format(len(params["axes"]), pix_dim.c)
 
     btn_convert.on_click(btn_convert_clicked)     
 
@@ -212,7 +214,7 @@ def select_n2v_parameter():
 
     ### N2V perc pixel
     ###################
-    float_n2v_perc_pix = widgets.BoundedFloatText(min=0, max=0.016, step=0.001, value=params['n2v_perc_pix'])
+    float_n2v_perc_pix = widgets.BoundedFloatText(min=0, max=1, step=0.001, value=params['n2v_perc_pix'])
     
     def on_n2v_perc_pix_change(change):
         params['n2v_perc_pix'] = change.new
