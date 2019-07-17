@@ -29,7 +29,7 @@ class GuiParamsN2V(GuiParams):
         self['train_epochs'] = 40
         self['train_steps_per_epoch'] = 100
         self['train_batch_size'] = 16
-        self['n2v_perc_pix'] = 0.016
+        self['n2v_perc_pix'] = 1.6
         self['n2v_patch_shape'] = []
         self['n2v_neighborhood_radius'] = 5
         self['augment'] = False
@@ -214,7 +214,7 @@ def select_n2v_parameter():
 
     ### N2V perc pixel
     ###################
-    float_n2v_perc_pix = widgets.BoundedFloatText(min=0, max=1, step=0.001, value=params['n2v_perc_pix'])
+    float_n2v_perc_pix = widgets.BoundedFloatText(min=0, max=100, step=0.1, value=params['n2v_perc_pix'])
     
     def on_n2v_perc_pix_change(change):
         params['n2v_perc_pix'] = change.new
@@ -234,7 +234,7 @@ def select_n2v_parameter():
     ##############
     n2v_parameter = widgets.VBox([
                                   widgets.HBox([widgets.Label('Neighborhood radius', layout={'width':'200px'}), int_n2v_neighborhood_radius]),
-                                  widgets.HBox([widgets.Label('Perc. pixel manipulation', layout={'width':'200px'}), float_n2v_perc_pix]),
+                                  widgets.HBox([widgets.Label('Percent pixel manipulation', layout={'width':'200px'}), float_n2v_perc_pix]),
                                   widgets.HBox([widgets.Label('Model name', layout={'width':'200px'}), text_n2v_name]),
                                 ])                    
 
