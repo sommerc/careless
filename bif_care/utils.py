@@ -159,15 +159,25 @@ def get_upscale_factors(in_dir, low_wc, high_wc):
 
 
 class BFListReader(object):
-    def __init__(self, path, glob_flt):
+    def __init__(self):
+        self.img_fns = None
+        self.axes = None
+
+    def from_glob(self, path, glob_flt):
         self.path = path
         self.glob_flt = glob_flt
 
-        self.img_fns = self.get_file_list()
-
-    def get_file_list(self):
         assert os.path.exists(self.path), "Input folder '{}' does not exist".format(self.path)
-        return sorted(list( pathlib.Path(self.path).glob(self.glob_flt)))
+        self.img_fns = sorted(list( pathlib.Path(self.path).glob(self.glob_flt)))
+
+    def from_file_list(self, img_fns):
+        for f in img_fns:
+            assert os.path.exists(f), "Image '{}' does not exist".format(f)
+
+        self.img_fns = img_fns
+
+    def get_file_names(self):
+        return self.img_fns
 
     def get_axes(self, img_fn):
         res = ""
@@ -188,7 +198,7 @@ class BFListReader(object):
             dim = self.get_axes(fn)
             dims.append(dim)
 
-        assert dims.count(dims[0]) == len(dims), "Dimensions of image files do not match"
+        assert dims.count(dims[0]) == len(dims), "Dimensions of image files do not match: " + ", ".join(dims)
 
         self.axes = dims[0]
         return dims[0]
