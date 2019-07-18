@@ -46,7 +46,7 @@ Noise2void does not require pairs of images.
 2. Open your renamed `my_n2v_project.ipynb` file in Jypyter or IPyhton notebook.
 3. Follow steps in the notebook
 
-# Installation
+# Installation (care and n2v)
 ### NVidia Cuda and cuDNN
 1. Install [NVidia CUDA toolkit](https://developer.nvidia.com/cuda-toolkit-archive)
 2. Install [NVidia cuDNN](https://developer.nvidia.com/cudnn)
