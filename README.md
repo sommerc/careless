@@ -1,6 +1,7 @@
-# bif_care
-Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.com/) a toolbox for Content-aware Image Restoration.
+# bif_care|n2v
+Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.com/) a toolbox for Content-aware Image Restoration and to [Noise2void](https://github.com/juglab/n2v)
 
+# care
 ## How to use:
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
@@ -38,8 +39,14 @@ You can predict new images in the IPython notebook directly using the prediction
 3. Select network file `<bif_care-out-folder>/models/CH_X_model/TF_SavedModel.zip` as 'Import model (.zip)' of your trained channel
 4. Set additional parameters such as number of tiles (higher number, in case your entire image cannot be loaded on your GPU memory) and press OK
 
+# Noise2void
+## How to use:
+Noise2void does not require pairs of images.
+1. Copy and rename the IPython notebook template file: `bif_n2v_templ.ipynb` to `my_n2v_project.ipynb`
+2. Open your renamed `my_n2v_project.ipynb` file in Jypyter or IPyhton notebook.
+3. Follow steps in the notebook
 
-## Installation
+# Installation
 ### NVidia Cuda and cuDNN
 1. Install [NVidia CUDA toolkit](https://developer.nvidia.com/cuda-toolkit-archive)
 2. Install [NVidia cuDNN](https://developer.nvidia.com/cudnn)
