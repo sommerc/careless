@@ -1,6 +1,5 @@
 import os
 import re
-import time
 import numpy
 import pathlib
 import javabridge as jv
