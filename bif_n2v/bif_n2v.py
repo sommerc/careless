@@ -297,6 +297,8 @@ def train_predict(n_tiles=(1,4,4), params=params, **unet_config):
 
             patches = N2V_DataGenerator().generate_patches_from_list(img_ch, num_patches_per_img=npatches, shape=params['patch_size'], augment=params['augment'])
 
+            numpy.random.shuffle(patches)
+
             sep = int(len(patches)*0.9)
             X     = patches[:sep]
             X_val = patches[ sep:]
