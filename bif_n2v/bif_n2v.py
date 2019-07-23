@@ -266,6 +266,16 @@ def train_predict(n_tiles=(1,4,4), params=params, **unet_config):
         Activate batch norm
     unet_last_activation : str
         Parameter `last_activation` of :func:`n2v_old.nets.common_unet`. Default: ``linear``
+    train_learning_rate : float
+        Learning rate for training. Default: ``0.0004``
+    n2v_patch_shape : tuple
+        Random patches of this shape are extracted from the given training data. Default: ``(64, 64) if n_dim==2 else (64, 64, 64)``
+    n2v_manipulator : str
+        Noise2Void pixel value manipulator. Default: ``uniform_withCP``
+    train_reduce_lr : dict
+        Parameter :class:`dict` of ReduceLROnPlateau_ callback; set to ``None`` to disable. Default: ``{'factor': 0.5, 'patience': 10}``
+    n2v_manipulator : str
+        Noise2Void pixel value manipulator. Default: ``uniform_withCP``
     """
     from n2v.models import N2VConfig, N2V
     from csbdeep.utils import plot_history
