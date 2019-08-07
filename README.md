@@ -58,7 +58,12 @@ The installation of the CUDA toolkit is straight-forward. To download cuDNN you 
 2. NVidia CUDA toolkit 10.0 + cuDNN 7.5.1 + tensorflow 13.1 (recommended)
 
 ### Python dependencies
-We strongly recommend using the [Anaconda Python distribution](https://www.anaconda.com/distribution/) with Python == 3.6. Furthermore, we recommend to create a new conda virtual environment with `conda create -n py36_bif_care python=3.6 anaconda`.
+We strongly recommend using the [Anaconda Python distribution](https://www.anaconda.com/distribution/) with Python == 3.6. Furthermore, we recommend to create a new conda virtual environment for Python 3.6 with:
+
+```
+conda create -n py36_bif_care python=3.6 anaconda
+conda activate py36_bif_care
+```
 
 You can install all mayor dependencies, including tensforflow (1.12.1) and csbdepp (0.3.0) by:
 
@@ -66,6 +71,7 @@ You can install all mayor dependencies, including tensforflow (1.12.1) and csbde
 cd <this-path>
 pip install -r requirements.txt -e .
 ```
+If you observe problems installing javabridge see troubleshooting below.
 
 If your Python distribution comes without PyQt5, install it by:
 
@@ -74,7 +80,7 @@ conda install pyqt
 ```
 
 ### IPython widgets
-The user interface is written using IPython/Jupyter widgets, which requires the installation of [node.js]([nodejs](https://nodejs.org/en/))
+The user interface is written using IPython/Jupyter widgets, which requires the installation of [node.js](https://nodejs.org/en/))
 
 Finally, you have to install jypyter widgets and enable them, by:
 
@@ -99,7 +105,7 @@ Unzip, copy and rename (e. g. *_low.tif*, *_high.tif*) the images form `low` and
 * To install bioformats/ javabridge you need the Microsoft Visual Studio compiler runtime 2015 (14.0) installed, which is included with Microsoft Visual Studio community edition >=2017
 * To install bioformats/ javabridge you need Java SDK 8 (1.8) or download [pre-compiled .whl](https://www.lfd.uci.edu/~gohlke/pythonlibs/) packages and install them by:
 
-    `pip install <javabridge>.whl` and `pip install <bioformats>.whl`
+```pip install <javabridge_cp36_amd64>.whl` and `pip install <bioformatse_cp36_amd64>.whl```
 
 
 
