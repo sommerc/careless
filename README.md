@@ -58,7 +58,7 @@ The installation of the CUDA toolkit is straight-forward. To download cuDNN you 
 2. NVidia CUDA toolkit 10.0 + cuDNN 7.5.1 + tensorflow 13.1 (recommended)
 
 ### Python dependencies
-We strongly recommend using the [Anaconda Python distribution](https://www.anaconda.com/distribution/) with Python == 3.6. Furthermore, we recommend to create a new conda virtual environment for Python 3.6 with:
+We strongly recommend using the [Anaconda Python distribution (64bit)](https://www.anaconda.com/distribution/) with Python == 3.6. Furthermore, we recommend to create a new conda virtual environment for Python 3.6 with:
 
 ```
 conda create -n py36_bif_care python=3.6 anaconda
@@ -80,7 +80,8 @@ conda install pyqt
 ```
 
 ### IPython widgets
-The user interface is written using IPython/Jupyter widgets, which requires the installation of [node.js](https://nodejs.org/en/))
+The user interface is written using IPython/Jupyter widgets, which requires the installation of [node.js](https://nodejs.org/en/)).
+Install it by using the official installer or by: `conda install -c conda-forge nodejs` from an Anaconda prompt.
 
 Finally, you have to install jypyter widgets and enable them, by:
 
@@ -99,7 +100,7 @@ The authors of [CARE](https://github.com/CSBDeep/CSBDeep/tree/master/examples) p
 Unzip, copy and rename (e. g. *_low.tif*, *_high.tif*) the images form `low` and `GT` into a single folder.
 
 ### Comparison of CARE with N2V
-![bif_care User interface](img/example_result.png)
+![bif_care User interface](img/example_result.png "Comparison of CARE with N2V")
 
 
 ### Troubleshooting and known issues
@@ -108,7 +109,9 @@ Unzip, copy and rename (e. g. *_low.tif*, *_high.tif*) the images form `low` and
 * To install bioformats/ javabridge you need the Microsoft Visual Studio compiler runtime 2015 (14.0) installed, which is included with Microsoft Visual Studio community edition >=2017
 * To install bioformats/ javabridge you need Java SDK 8 (1.8) or download [pre-compiled .whl](https://www.lfd.uci.edu/~gohlke/pythonlibs/) packages and install them by:
 
-```pip install <javabridge_cp36_amd64>.whl` and `pip install <bioformatse_cp36_amd64>.whl```
+    ```pip install <javabridge_cp36_amd64>.whl` and `pip install <bioformatse_cp36_amd64>.whl```
+
+* It may be required to launch Anaconda / Anaconda prompt as administrator
 
 
 
