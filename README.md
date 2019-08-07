@@ -98,6 +98,9 @@ The authors of [CARE](https://github.com/CSBDeep/CSBDeep/tree/master/examples) p
 
 Unzip, copy and rename (e. g. *_low.tif*, *_high.tif*) the images form `low` and `GT` into a single folder.
 
+### Comparison of CARE with N2V
+![bif_care User interface](img/example_result.png)
+
 
 ### Troubleshooting and known issues
 * tensorflow 1.13.x requires NVidia tookit 10.0 for the latest csbdeep 0.3.0 release. 
