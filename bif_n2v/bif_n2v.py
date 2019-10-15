@@ -458,5 +458,6 @@ def cmd_line():
         files = None
     plt.ion()
     train_predict(params=params, files=files, n_tiles=tuple(args.ntiles))
+    plt.close('all')
     sys.exit(0)
 
