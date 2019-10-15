@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import glob
 import time
@@ -436,9 +437,11 @@ def predict(files, n_tiles=(1,4,4), params=params):
                                                                                                 'unit'     : unit})
 def cmd_line():
     import argparse
+    from matplotlib import pyplot as plt
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--n2v_project',  type=str, nargs=1, help="BIF noise2void project file (.json)")
     parser.add_argument('files',  type=str, nargs="*", help="Files to process with noise2void")
+    parser.add_argument('--ntiles', nargs=3, type=int, default=[1, 8, 8])
 
     args = parser.parse_args()
     params.load(args.n2v_project[0])
@@ -446,11 +449,14 @@ def cmd_line():
     print("-"*50)
     for k, v in params.items():
         print("{:25s}: {}".format(k,v))
+    print("n-tiles:", args.ntiles)
 
     print("\n")
 
     files = args.files
     if len(files) == 0:
         files = None
-    train_predict(params=params, files=files)
+    plt.ion()
+    train_predict(params=params, files=files, n_tiles=tuple(args.ntiles))
+    sys.exit(0)
 
