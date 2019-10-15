@@ -22,21 +22,21 @@ def get_space_time_resolution(img_path):
     C = i.Pixels.get_SizeC()
     Z = i.Pixels.get_SizeZ()
     T = i.Pixels.get_SizeT()
-    
+
     X_res = i.Pixels.get_PhysicalSizeX()
     Y_res = i.Pixels.get_PhysicalSizeY()
     Z_res = i.Pixels.get_PhysicalSizeZ()
-    
+
     X_res_unit = i.Pixels.get_PhysicalSizeXUnit()
     Y_res_unit = i.Pixels.get_PhysicalSizeYUnit()
     Z_res_unit = i.Pixels.get_PhysicalSizeZUnit()
-    
+
     if None in [X_res, Y_res]:
         X_res = Y_res = 1
-    
+
     if None in [X_res_unit, Y_res_unit]:
         X_res_unit = Y_res_unit = "pixel"
-        
+
     if Z_res is None:
         Z_res = 1
         Z_res_unit = "pixel"
@@ -47,17 +47,17 @@ def get_space_time_resolution(img_path):
         Y_res_unit = "micron"
 
     if '\xb5' in Z_res_unit:
-        Z_res_unit = "micron"  
+        Z_res_unit = "micron"
 
     i.Pixels.get_PhysicalSizeZUnit()
-    
+
     frame_interval = 0
     Tunit = "sec."
-    
+
     if i.Pixels.node.get("TimeIncrement"):
         frame_interval = i.Pixels.node.get("TimeIncrement")
         Tunit = i.Pixels.node.get("TimeIncrementUnit")
-        
+
     elif (T > 1) and i.Pixels.get_plane_count() > 0:
         plane_axes = i.Pixels.get_DimensionOrder().replace("X", "").replace("Y", "")
 
@@ -85,8 +85,8 @@ class JVM(object):
 
     def start(self):
         if not JVM.started:
-            jv.start_vm(class_path=bf.JARS, 
-                        max_heap_size='8G', 
+            jv.start_vm(class_path=bf.JARS,
+                        max_heap_size='8G',
                         args=["-Dlog4j.configuration=file:{}".format(self.log_config),],
                         run_headless=True)
             JVM.started = True
@@ -98,15 +98,15 @@ class JVM(object):
 
 def get_pixel_dimensions(fn):
     JVM().start()
- 
+
     ir = bf.ImageReader(str(fn))
-    
+
     t_size = ir.rdr.getSizeT()
     z_size = ir.rdr.getSizeZ()
     c_size = ir.rdr.getSizeC()
     y_size = ir.rdr.getSizeY()
     x_size = ir.rdr.getSizeX()
-    
+
     ir.close()
     return Axes(t_size, z_size, c_size, y_size, x_size)
 
@@ -137,7 +137,7 @@ def check_file_lists(in_dir, low_wc, high_wc):
 
         if dim_low.t != dim_high.t:
             return False, "Low and high quality images have different number of time points\n '{}' != '{}'".format(fl, fh)
-        
+
         if (dim_low.x > dim_high.x) or \
            (dim_low.y > dim_high.y) or \
            (dim_low.z > dim_high.z):
@@ -146,9 +146,9 @@ def check_file_lists(in_dir, low_wc, high_wc):
     return True, "OK"
 
 
-def get_upscale_factors(in_dir, low_wc, high_wc): 
+def get_upscale_factors(in_dir, low_wc, high_wc):
     low_fl = get_file_list(in_dir, low_wc)
-    high_fl = get_file_list(in_dir, high_wc)        
+    high_fl = get_file_list(in_dir, high_wc)
 
     low_dim  = get_pixel_dimensions(str(low_fl[0]))
     high_dim = get_pixel_dimensions(str(high_fl[0]))
@@ -220,14 +220,39 @@ class BFListReader(object):
                     for c in range(dims.c):
                         img[t, z, :, :, c] = ir.read(series=0,
                                                     z=z,
-                                                    c=c, 
+                                                    c=c,
                                                     t=t, rescale=False)
 
             if "Z" not in axes:
-                img = img[:, 0, ...] 
+                img = img[:, 0, ...]
             res.append(img)
             ir.close()
         return res
+
+    def load_imgs_generator(self):
+        axes = self.check_dims_equal()
+
+        for fn in self.img_fns:
+            dims = get_pixel_dimensions(fn)
+            print("  -- ", fn, dims)
+
+            ir = bf.ImageReader(str(fn))
+
+            img = numpy.zeros((dims.t, dims.z, dims.y, dims.x, dims.c), numpy.float32)
+            for t in range(dims.t):
+                for z in range(dims.z):
+                    for c in range(dims.c):
+                        img[t, z, :, :, c] = ir.read(series=0,
+                                                    z=z,
+                                                    c=c,
+                                                    t=t, rescale=False)
+
+            if "Z" not in axes:
+                img = img[:, 0, ...]
+            yield img
+
+            ir.close()
+
 
 
 
