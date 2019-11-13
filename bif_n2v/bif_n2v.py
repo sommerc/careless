@@ -297,8 +297,7 @@ def train_predict(n_tiles=(1,4,4), params=params, files=None, **unet_config):
     else:
         datagen.from_file_list(files)
 
-    imgs_for_patches = datagen.load_imgs_generator()
-    imgs_for_predict = datagen.load_imgs_generator()
+
 
 
     with Timer('Training and Prediction'):
@@ -306,6 +305,9 @@ def train_predict(n_tiles=(1,4,4), params=params, files=None, **unet_config):
         print("Training ...")
         for c in params["train_channels"]:
             print("  -- Channel {}".format(c))
+
+            imgs_for_patches = datagen.load_imgs_generator()
+            imgs_for_predict = datagen.load_imgs_generator()
 
             img_ch = (im[..., c:c+1] for im in imgs_for_patches)
             img_ch_predict = (im[..., c:c+1] for im in imgs_for_predict)
