@@ -27,9 +27,9 @@ def get_space_time_resolution(img_path):
     Y_res = i.Pixels.get_PhysicalSizeY()
     Z_res = i.Pixels.get_PhysicalSizeZ()
 
-    X_res_unit = i.Pixels.get_PhysicalSizeXUnit()
-    Y_res_unit = i.Pixels.get_PhysicalSizeYUnit()
-    Z_res_unit = i.Pixels.get_PhysicalSizeZUnit()
+    X_res_unit = i.Pixels.get_PhysicalSizeXUnit() or "micron"
+    Y_res_unit = i.Pixels.get_PhysicalSizeYUnit() or "micron"
+    Z_res_unit = i.Pixels.get_PhysicalSizeZUnit() or "micron"
 
     if None in [X_res, Y_res]:
         X_res = Y_res = 1
