@@ -400,13 +400,13 @@ def predict(files, n_tiles=(1,4,4), params=params):
 
     assert axes == params["axes"], "The files to predict have different dimensionality: {} != {}".format(axes, params["axes"])
 
-    imgs = datagen.load_imgs()
+    imgs = datagen.load_imgs_generator()
 
     print("Predicting ...")
     for c in params["train_channels"]:
         print("  -- Channel {}".format(c))
 
-        img_ch = [im[..., c:c+1] for im in imgs]
+        img_ch = (im[..., c:c+1] for im in imgs)
         # a name used to identify the model
         model_name = '{}_ch{}'.format(params['name'], c)
         # We are now creating our network model.
