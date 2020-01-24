@@ -11,6 +11,9 @@ from matplotlib import pyplot as plt
 from skimage.transform import rescale
 from tqdm import tqdm_notebook as tqdm
 
+import warnings
+warnings.simplefilter("ignore")
+
 import tensorflow as tf
 from csbdeep.utils import plot_some
 from csbdeep.models import Config, CARE

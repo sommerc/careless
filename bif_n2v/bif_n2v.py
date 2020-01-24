@@ -4,6 +4,9 @@ import json
 import glob
 import time
 import numpy
+import warnings
+warnings.simplefilter("ignore")
+
 import pathlib
 import tifffile
 import ipywidgets as widgets
@@ -439,7 +442,7 @@ def cmd_line():
     import argparse
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--n2v_project',  type=str, nargs=1, help="BIF noise2void project file (.json)")
+    parser.add_argument('--n2v_project',  type=str, nargs=1, help="BIF noise2void project file (.json)", required=True)
     parser.add_argument('files',  type=str, nargs="*", help="Files to process with noise2void")
     parser.add_argument('--ntiles', nargs=3, type=int, default=[1, 8, 8])
     parser.add_argument('--model_name', nargs=1, type=str, default=None)
