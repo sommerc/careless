@@ -15,10 +15,10 @@ from bif_care.qt_file_dialog import gui_fname
 from bif_care.qt_dir_dialog import gui_dirname
 from bif_care.qt_files_dialog import gui_fnames
 from bif_care.qt_filesave_dialog import gui_fsavename
-from bif_care.utils import get_pixel_dimensions, get_space_time_resolution, get_file_list, Timer
+from bif_care.utils import get_pixel_dimensions, get_space_time_resolution, get_file_list
 from bif_care.gui import GuiParams, select_project, select_train_paramter, select_file_to_predict
 
-description = """Noise2Void interface"""
+description = """Careless Noise2Void interface"""
 
 class GuiParamsN2V(GuiParams):
     def initialize(self):
@@ -40,8 +40,6 @@ class GuiParamsN2V(GuiParams):
 
 params = GuiParamsN2V()
 params.initialize()
-
-#params.loadn_("J:/_BIF/RH/Noisy MO/bif_n2v.json")
 
 select_project = partial(select_project, default_name='./bif_n2v.json', params=params)
 select_train_paramter = partial(select_train_paramter, params=params)
@@ -239,8 +237,6 @@ def select_n2v_parameter():
 
     text_n2v_name.observe(on_text_n2v_name_change, 'value')
 
-
-
     ### Combine
     ##############
     n2v_parameter = widgets.VBox([
@@ -251,7 +247,7 @@ def select_n2v_parameter():
 
     display(n2v_parameter)
 
-def train_predict(n_tiles=(1,4,4), params=params, files=None, **unet_config):
+def train_predict(n_tiles=(1,4,4), params=params, files=None, headless=False, **unet_config):
     """
     These advanced options can be set by keyword arguments:
 
@@ -281,10 +277,13 @@ def train_predict(n_tiles=(1,4,4), params=params, files=None, **unet_config):
         Noise2Void pixel value manipulator. Default: ``uniform_withCP``
     """
     from n2v.models import N2VConfig, N2V
-    from csbdeep.utils import plot_history
+
     from n2v.utils.n2v_utils import manipulate_val_data
     from n2v.internals.N2V_DataGenerator import N2V_DataGenerator
-    from matplotlib import pyplot as plt
+
+    if not headless:
+        from csbdeep.utils import plot_history
+        from matplotlib import pyplot as plt
 
     np = numpy
 
@@ -298,93 +297,92 @@ def train_predict(n_tiles=(1,4,4), params=params, files=None, **unet_config):
         datagen.from_file_list(files)
 
 
+    print("Training ...")
+    for c in params["train_channels"]:
+        print("  -- Channel {}".format(c))
+
+        imgs_for_patches = datagen.load_imgs_generator()
+        imgs_for_predict = datagen.load_imgs_generator()
+
+        img_ch = (im[..., c:c+1] for im in imgs_for_patches)
+        img_ch_predict = (im[..., c:c+1] for im in imgs_for_predict)
+
+        npatches = params["n_patches_per_image"] if params["n_patches_per_image"] > 1 else None
+
+        patches = N2V_DataGenerator().generate_patches_from_list(img_ch, num_patches_per_img=npatches, shape=params['patch_size'], augment=params['augment'])
+
+        numpy.random.shuffle(patches)
+
+        sep = int(len(patches)*0.9)
+        X     = patches[:sep]
+        X_val = patches[ sep:]
+
+        config = N2VConfig(X,
+                        train_steps_per_epoch=params["train_steps_per_epoch"],
+                        train_epochs=params["train_epochs"],
+                        train_loss='mse',
+                        train_batch_size=params["train_batch_size"],
+                        n2v_perc_pix=params["n2v_perc_pix"],
+                        n2v_patch_shape=params['patch_size'],
+                        n2v_manipulator='uniform_withCP',
+                        n2v_neighborhood_radius=params["n2v_neighborhood_radius"], **unet_config)
 
 
-    with Timer('Training and Prediction'):
+        # a name used to identify the model
+        model_name = '{}_ch{}'.format(params['name'], c)
+        # the base directory in which our model will live
+        basedir = 'models'
+        # We are now creating our network model.
+        model = N2V(config=config, name=model_name, basedir=params["in_dir"])
 
-        print("Training ...")
-        for c in params["train_channels"]:
-            print("  -- Channel {}".format(c))
-
-            imgs_for_patches = datagen.load_imgs_generator()
-            imgs_for_predict = datagen.load_imgs_generator()
-
-            img_ch = (im[..., c:c+1] for im in imgs_for_patches)
-            img_ch_predict = (im[..., c:c+1] for im in imgs_for_predict)
-
-            npatches = params["n_patches_per_image"] if params["n_patches_per_image"] > 1 else None
-
-            patches = N2V_DataGenerator().generate_patches_from_list(img_ch, num_patches_per_img=npatches, shape=params['patch_size'], augment=params['augment'])
-
-            numpy.random.shuffle(patches)
-
-            sep = int(len(patches)*0.9)
-            X     = patches[:sep]
-            X_val = patches[ sep:]
-
-            config = N2VConfig(X,
-                            train_steps_per_epoch=params["train_steps_per_epoch"],
-                            train_epochs=params["train_epochs"],
-                            train_loss='mse',
-                            train_batch_size=params["train_batch_size"],
-                            n2v_perc_pix=params["n2v_perc_pix"],
-                            n2v_patch_shape=params['patch_size'],
-                            n2v_manipulator='uniform_withCP',
-                            n2v_neighborhood_radius=params["n2v_neighborhood_radius"], **unet_config)
+        history = model.train(X, X_val)
 
 
-            # a name used to identify the model
-            model_name = '{}_ch{}'.format(params['name'], c)
-            # the base directory in which our model will live
-            basedir = 'models'
-            # We are now creating our network model.
-            model = N2V(config=config, name=model_name, basedir=params["in_dir"])
-
-            history = model.train(X, X_val)
+        val_patch = X_val[0,..., 0]
+        val_patch_pred = model.predict(val_patch, axes=params["axes"])
 
 
-            val_patch = X_val[0,..., 0]
-            val_patch_pred = model.predict(val_patch, axes=params["axes"])
+        if "Z" in params["axes"]:
+            val_patch      = val_patch.max(0)
+            val_patch_pred = val_patch_pred.max(0)
+
+        if not headless:
             f, ax = plt.subplots(1,2, figsize=(14,7))
-
-            if "Z" in params["axes"]:
-                val_patch      = val_patch.max(0)
-                val_patch_pred = val_patch_pred.max(0)
-
             ax[0].imshow(val_patch,cmap='gray')
             ax[0].set_title('Validation Patch')
             ax[1].imshow(val_patch_pred,cmap='gray')
             ax[1].set_title('Validation Patch N2V')
 
+
             plt.figure(figsize=(16,5))
             plot_history(history,['loss','val_loss'])
 
-            print("  -- Predicting channel {}".format(c))
-            for f, im in zip(files, img_ch_predict):
-                print("  -- {}".format(f))
-                pixel_reso = get_space_time_resolution(str(f))
-                res_img = []
-                for t in range(len(im)):
-                    nt = n_tiles if "Z" in params["axes"] else n_tiles[1:]
-                    pred = model.predict(im[t,..., 0], axes=params["axes"], n_tiles=nt)
+        print("  -- Predicting channel {}".format(c))
+        for f, im in zip(files, img_ch_predict):
+            print("  -- {}".format(f))
+            pixel_reso = get_space_time_resolution(str(f))
+            res_img = []
+            for t in range(len(im)):
+                nt = n_tiles if "Z" in params["axes"] else n_tiles[1:]
+                pred = model.predict(im[t,..., 0], axes=params["axes"], n_tiles=nt)
 
-                    if "Z" in params["axes"]:
-                        pred = pred[:, None, ...]
-                    res_img.append(pred)
+                if "Z" in params["axes"]:
+                    pred = pred[:, None, ...]
+                res_img.append(pred)
 
-                pred = numpy.stack(res_img)
-                if "Z" not in params["axes"]:
-                        pred = pred[:, None,     None, ...]
+            pred = numpy.stack(res_img)
+            if "Z" not in params["axes"]:
+                    pred = pred[:, None,     None, ...]
 
-                reso      = (1 / pixel_reso.X, 1 / pixel_reso.Y )
-                spacing   = pixel_reso.Z
-                unit      = pixel_reso.Xunit
-                finterval = pixel_reso.T
+            reso      = (1 / pixel_reso.X, 1 / pixel_reso.Y )
+            spacing   = pixel_reso.Z
+            unit      = pixel_reso.Xunit
+            finterval = pixel_reso.T
 
-                tifffile.imsave("{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c), pred, imagej=True, resolution=reso, metadata={'axes': 'TZCYX',
-                                                                                                    'finterval': finterval,
-                                                                                                    'spacing'  : spacing,
-                                                                                                    'unit'     : unit})
+            tifffile.imsave("{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c), pred, imagej=True, resolution=reso, metadata={'axes': 'TZCYX',
+                                                                                                'finterval': finterval,
+                                                                                                'spacing'  : spacing,
+                                                                                                'unit'     : unit})
 
 
 def predict(files, n_tiles=(1,4,4), params=params):
@@ -439,11 +437,12 @@ def predict(files, n_tiles=(1,4,4), params=params):
                                                                                                 'unit'     : unit})
 def cmd_line():
     import argparse
-    from matplotlib import pyplot as plt
+
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--n2v_project',  type=str, nargs=1, help="BIF noise2void project file (.json)")
     parser.add_argument('files',  type=str, nargs="*", help="Files to process with noise2void")
     parser.add_argument('--ntiles', nargs=3, type=int, default=[1, 8, 8])
+    parser.add_argument('--model_name', nargs=1, type=str, default=None)
 
     args = parser.parse_args()
     params.load(args.n2v_project[0])
@@ -458,8 +457,12 @@ def cmd_line():
     files = args.files
     if len(files) == 0:
         files = None
-    plt.ion()
-    train_predict(params=params, files=files, n_tiles=tuple(args.ntiles))
-    plt.close('all')
+
+    model_name = args.model_name
+    if model_name is not None:
+        params["name"] = model_name
+
+    train_predict(params=params, files=files, n_tiles=tuple(args.ntiles), headless=True)
+
     sys.exit(0)
 
