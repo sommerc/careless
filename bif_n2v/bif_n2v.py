@@ -18,7 +18,7 @@ from bif_care.qt_file_dialog import gui_fname
 from bif_care.qt_dir_dialog import gui_dirname
 from bif_care.qt_files_dialog import gui_fnames
 from bif_care.qt_filesave_dialog import gui_fsavename
-from bif_care.utils import get_pixel_dimensions, get_space_time_resolution, get_file_list
+from bif_care.utils import get_pixel_dimensions, get_space_time_resolution, get_file_list, JVM
 from bif_care.gui import GuiParams, select_project, select_train_paramter, select_file_to_predict
 
 description = """Careless Noise2Void interface"""
@@ -463,9 +463,10 @@ def cmd_line():
 
     model_name = args.model_name
     if model_name is not None:
-        params["name"] = model_name
+        params["name"] = model_name[0]
 
     train_predict(params=params, files=files, n_tiles=tuple(args.ntiles), headless=True)
 
+    JVM().shutdown()
     sys.exit(0)
 
