@@ -1,7 +1,7 @@
-# bif_care|n2v
-Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.com/) a toolbox for Content-aware Image Restoration and to [Noise2void](https://github.com/juglab/n2v)
+# care-*less* CARE|n2v
+Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.com/) a toolbox for Content-aware Image Restoration and to [Noise2Void](https://github.com/juglab/n2v)
 
-# care
+# CARE
 ## How to use:
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
@@ -12,7 +12,7 @@ CARE needs pairs of registered images - low (input) and high (output) quality. I
 0. Clone this repository with `git clone https://....`
 1. Copy and rename the IPython notebook template file: `bif_care_templ.ipynb` to `my_care_project.ipynb`
 2. Open your renamed `my_care_project.ipynb` file in Jypyter or IPyhton notebook.
-3. In order to train CARE, the path to the image pairs needs to be specified. Then, choose images for low and high quality respectively using a wild-card (e.g. `low*.tif` and `high*.tif`). The images will be converted and image patches are extracted. This step is required for efficient GPU execution. Choose patch sizes for your input dimensions `(Z)YX` and set how many patches should be extracted per image pair. After image patches have been extracted, they are saved to the output directory. 
+3. In order to train CARE, the path to the image pairs needs to be specified. Then, choose images for low and high quality respectively using a wild-card (e.g. `low*.tif` and `high*.tif`). The images will be converted and image patches are extracted. This step is required for efficient GPU execution. Choose patch sizes for your input dimensions `(Z)YX` and set how many patches should be extracted per image pair. After image patches have been extracted, they are saved to the output directory.
 
 #### Training the network
 The training of a neural network is done iteratively in `epochs`. In each epoch, the network weights' are updated by optimizing a loss function on `steps_per_epoch` batches of image patches. The size of the batches is given by `batch_size`. To make use of all your image data, select `steps_per_epoch = #patches / batch_size`. Per default, 10% of patches are used for validation and not used in training.
@@ -39,7 +39,9 @@ You can predict new images in the IPython notebook directly using the prediction
 3. Select network file `<bif_care-out-folder>/models/CH_X_model/TF_SavedModel.zip` as 'Import model (.zip)' of your trained channel
 4. Set additional parameters such as number of tiles (higher number, in case your entire image cannot be loaded on your GPU memory) and press OK
 
-# Noise2void
+---
+
+# Noise2Void
 ## How to use:
 Noise2void does not require pairs of images.
 1. Copy and rename the IPython notebook template file: `bif_n2v_templ.ipynb` to `my_n2v_project.ipynb`
@@ -104,7 +106,7 @@ Unzip, copy and rename (e. g. *_low.tif*, *_high.tif*) the images form `low` and
 
 
 ### Troubleshooting and known issues
-* tensorflow 1.13.x requires NVidia tookit 10.0 for the latest csbdeep 0.3.0 release. 
+* tensorflow 1.13.x requires NVidia tookit 10.0 for the latest csbdeep 0.3.0 release.
 * Currently NVidia toolkit 10.1 is not supported by the latest tensorflow==13.1 release
 * To install bioformats/ javabridge you need the Microsoft Visual Studio compiler runtime 2015 (14.0) installed, which is included with Microsoft Visual Studio community edition >=2017
 * To install bioformats/ javabridge you need Java SDK 8 (1.8) or download [pre-compiled .whl](https://www.lfd.uci.edu/~gohlke/pythonlibs/) packages and install them by:
