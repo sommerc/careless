@@ -1,4 +1,8 @@
 .ipynb_checkpoints/
+bif_care.egg-info/
+build/
+dist/
+exp/
 *.pyc
 *.db
 *.tif
