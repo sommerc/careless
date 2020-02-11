@@ -1,8 +1,10 @@
 import os
 import sys
+import glob
 import json
 import numpy
 import pathlib
+import argparse
 import tifffile
 import javabridge as jv
 import bioformats as bf
@@ -31,7 +33,7 @@ warnings.filterwarnings("ignore")
 tf.logging.set_verbosity(tf.logging.ERROR)
 if type(tf.contrib) != type(tf): tf.contrib._warning = None
 
-class BifCareInputConverter(object):
+class CareInputConverter(object):
     def __init__(self, **params):
         self.order = 0
         self.__dict__.update(**params)
@@ -103,9 +105,12 @@ class BifCareInputConverter(object):
         self._convert(self.high_wc, "GT")
         print("Done")
 
-class BifCareTrainer(object):
+class CareTrainer(object):
     def __init__(self, **params):
         self.order = 0
+
+        if len(params) == 0:
+            from .care import params
         self.__dict__.update(**params)
 
     def create_patches(self):
@@ -283,6 +288,59 @@ class BifCareTrainer(object):
                 tifffile.imsave(ch_out_fn, res_image_ch)
 
             res_image_ch = None # should trigger gc and free the memory
+
+
+
+
+description = """BIF-Care command line script for predicting new images given existing project."""
+
+def get_args():
+    """
+    Helper function for the argument parser.
+    """
+    parser = argparse.ArgumentParser(description=description)
+
+    # Add arguments
+    parser.add_argument('--care_project',  type=str, nargs=1, help="CAREless care project file (.json)", required=True)
+    parser.add_argument('files',  type=str, nargs="+", help="Files to predict")
+    parser.add_argument('--ntiles', nargs=3, type=int, default=[1, 8, 8])
+
+    # parser.add_argument('-p', '-project', type=str, action='store', required=True, help="BIF-Care project file")
+    # parser.add_argument('-t', '-tiles'  ,  type=str, action='store', default="1,4,4", help="Tiles in ZYX (default: 1,4,4)")
+
+    # parser.add_argument('files', type=str, nargs='+', help='Images to predict')
+
+    args = parser.parse_args()
+
+    return args
+
+def cmd_line():
+    from .care import GuiParams
+
+    args = get_args()
+    assert os.path.exists(args.care_project[0]), f"Project file '{args.care_project[0]}'' does not exist."
+
+    params = GuiParams()
+    params.load(args.care_project[0])
+
+    print("\n\nCAREless care parameters")
+    print("-"*50)
+    for k, v in params.items():
+        print("{:25s}: {}".format(k,v))
+    print("n-tiles:", args.ntiles)
+
+    print("\n")
+
+    for fn in args.files:
+        assert os.path.exists(fn), f"File for prediction {fn} does not exist"
+
+    print("Predicting Careless...")
+
+    bt = CareTrainer(**params)
+    for fn in args.files:
+        bt.predict(fn, n_tiles=args.ntiles)
+
+    JVM().shutdown()
 
 
 

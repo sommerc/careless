@@ -1,16 +1,18 @@
 import re
 from setuptools import setup
- 
+
 with open("README.md", "rb") as f:
     description = f.read().decode("utf-8")
 
 setup(
-    name = "bif_care",
-    packages = ["bif_care"],
-    version = "0.2",
+    name = "CAREless",
+    packages = ["careless"],
+    version = "0.3",
     description = description,
     long_description = description,
-    entry_points = {'console_scripts': ['bif_n2v=bif_n2v.bif_n2v:cmd_line']},
+    entry_points = {'console_scripts': ['careless_n2v=careless.n2v.n2v:cmd_line',
+                                         'careless_Care=careless.care.core:cmd_line',
+                                            ]},
     author = "Christoph Sommer",
     author_email = "christoph.sommer23@gmail.com",
     )

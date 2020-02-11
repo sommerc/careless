@@ -1,4 +1,5 @@
 .ipynb_checkpoints/
+.idea/
 bif_care.egg-info/
 build/
 dist/

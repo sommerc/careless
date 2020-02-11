@@ -12,14 +12,13 @@ import tifffile
 import ipywidgets as widgets
 from functools import partial
 from IPython.display import display
-from bif_care.utils import BFListReader
 
-from bif_care.qt_file_dialog import gui_fname
-from bif_care.qt_dir_dialog import gui_dirname
-from bif_care.qt_files_dialog import gui_fnames
-from bif_care.qt_filesave_dialog import gui_fsavename
-from bif_care.utils import get_pixel_dimensions, get_space_time_resolution, get_file_list, JVM
-from bif_care.gui import GuiParams, select_project, select_train_paramter, select_file_to_predict
+from ..care.qt_file_dialog import gui_fname
+from ..care.qt_dir_dialog import gui_dirname
+from ..care.qt_files_dialog import gui_fnames
+from ..care.qt_filesave_dialog import gui_fsavename
+from ..care.utils import BFListReader, get_pixel_dimensions, get_space_time_resolution, get_file_list, JVM
+from ..care.care import GuiParams, select_project, select_train_paramter, select_file_to_predict
 
 description = """Careless Noise2Void interface"""
 
@@ -36,7 +35,7 @@ class GuiParamsN2V(GuiParams):
         self['train_epochs'] = 40
         self['train_steps_per_epoch'] = 100
         self['train_batch_size'] = 16
-        self['n2v_perc_pix'] = 1.6
+        self['n2v_perc_pix'] = 0.198
         self['n2v_patch_shape'] = []
         self['n2v_neighborhood_radius'] = 5
         self['augment'] = False
@@ -226,7 +225,7 @@ def select_n2v_parameter():
 
     ### N2V perc pixel
     ###################
-    float_n2v_perc_pix = widgets.BoundedFloatText(min=0, max=100, step=0.1, value=params['n2v_perc_pix'])
+    float_n2v_perc_pix = widgets.BoundedFloatText(min=0, max=100, step=0.01, value=params['n2v_perc_pix'])
 
     def on_n2v_perc_pix_change(change):
         params['n2v_perc_pix'] = change.new
@@ -441,15 +440,17 @@ def predict(files, n_tiles=(1,4,4), params=params):
 def cmd_line():
     import argparse
 
+    description = """CAREless Noise2Void: command line script for predicting new images given existing project."""
+
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--n2v_project',  type=str, nargs=1, help="BIF noise2void project file (.json)", required=True)
-    parser.add_argument('files',  type=str, nargs="*", help="Files to process with noise2void")
+    parser.add_argument('--n2v_project',  type=str, nargs=1, help="CAREless Noise2Void project file (.json)", required=True)
+    parser.add_argument('files',  type=str, nargs="*", help="Files to process with Noise2Void")
     parser.add_argument('--ntiles', nargs=3, type=int, default=[1, 8, 8])
     parser.add_argument('--model_name', nargs=1, type=str, default=None)
 
     args = parser.parse_args()
     params.load(args.n2v_project[0])
-    print("\n\nBIF_N2V Parameters")
+    print("\n\CAREless Noise2Void parameters")
     print("-"*50)
     for k, v in params.items():
         print("{:25s}: {}".format(k,v))
