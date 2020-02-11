@@ -141,7 +141,8 @@ def check_file_lists(in_dir, low_wc, high_wc):
         if (dim_low.x > dim_high.x) or \
            (dim_low.y > dim_high.y) or \
            (dim_low.z > dim_high.z):
-           return False, "Low quality images have higher spatial resolution"
+           print(fl)
+           return False, "Low quality images have higher spatial resolution e.g. '{}'".format(fl)
 
     return True, "OK"
 
