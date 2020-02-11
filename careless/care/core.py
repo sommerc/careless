@@ -14,9 +14,11 @@ from skimage.transform import rescale
 from tqdm import tqdm_notebook as tqdm
 
 import warnings
-warnings.simplefilter("ignore")
-
+warnings.filterwarnings("ignore")
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
 from csbdeep.utils import plot_some
 from csbdeep.models import Config, CARE
 from csbdeep.io import load_training_data
@@ -27,11 +29,6 @@ from csbdeep.utils import axes_dict, plot_some, plot_history
 from .utils import JVM, get_file_list, get_pixel_dimensions, \
                    get_upscale_factors, get_space_time_resolution, Timer
 
-import warnings
-warnings.filterwarnings("ignore")
-
-tf.logging.set_verbosity(tf.logging.ERROR)
-if type(tf.contrib) != type(tf): tf.contrib._warning = None
 
 class CareInputConverter(object):
     def __init__(self, **params):
@@ -161,8 +158,8 @@ class CareTrainer(object):
                 n_channel_in, n_channel_out = X.shape[c], Y.shape[c]
 
                 config = Config(axes, n_channel_in, n_channel_out, train_epochs=self.train_epochs,
-                                                                train_steps_per_epoch=self.train_steps_per_epoch,
-                                                                train_batch_size=self.train_batch_size,
+                                                                   train_steps_per_epoch=self.train_steps_per_epoch,
+                                                                   train_batch_size=self.train_batch_size,
                                                             **config_args,)
                 # Training
                 model = CARE(config, 'CH_{}_model'.format(ch), basedir=pathlib.Path(self.out_dir) / 'models')
@@ -171,8 +168,12 @@ class CareTrainer(object):
                 try:
                     history = model.train(X,Y, validation_data=(X_val,Y_val))
                 except tf.errors.ResourceExhaustedError:
-                    print("ResourceExhaustedError: Aborting...\n Training data too big for GPU. Are other GPU jobs running? Perhaps, reduce batch-size or patch-size?")
+                    print(" >> ResourceExhaustedError: Aborting...\n  Training data too big for GPU. Are other GPU jobs running? Perhaps, reduce batch-size or patch-size?")
                     return
+                except tf.errors.UnknownError:
+                    print(" >> UnknownError: Aborting...\n  No enough memory available on GPU... are other GPU jobs running?")
+                    return
+
 
                 #print(sorted(list(history.history.keys())))
                 plt.figure(figsize=(16,5))
@@ -292,23 +293,21 @@ class CareTrainer(object):
 
 
 
-description = """BIF-Care command line script for predicting new images given existing project."""
+
 
 def get_args():
     """
     Helper function for the argument parser.
     """
+
+    description = """CAREless care: command line script for predicting new images given existing project."""
+
     parser = argparse.ArgumentParser(description=description)
 
     # Add arguments
     parser.add_argument('--care_project',  type=str, nargs=1, help="CAREless care project file (.json)", required=True)
     parser.add_argument('files',  type=str, nargs="+", help="Files to predict")
     parser.add_argument('--ntiles', nargs=3, type=int, default=[1, 8, 8])
-
-    # parser.add_argument('-p', '-project', type=str, action='store', required=True, help="BIF-Care project file")
-    # parser.add_argument('-t', '-tiles'  ,  type=str, action='store', default="1,4,4", help="Tiles in ZYX (default: 1,4,4)")
-
-    # parser.add_argument('files', type=str, nargs='+', help='Images to predict')
 
     args = parser.parse_args()
 

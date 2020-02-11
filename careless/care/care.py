@@ -5,7 +5,15 @@ import pathlib
 import ipywidgets as widgets
 from functools import partial
 from IPython.display import display
+
+import warnings
+warnings.filterwarnings("ignore")
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
 from csbdeep.utils import plot_some
+
 from .qt_file_dialog import gui_fname
 from .qt_dir_dialog import gui_dirname
 from .qt_filesave_dialog import gui_fsavename

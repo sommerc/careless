@@ -4,14 +4,19 @@ import json
 import glob
 import time
 import numpy
-import warnings
-warnings.simplefilter("ignore")
 
 import pathlib
 import tifffile
 import ipywidgets as widgets
 from functools import partial
 from IPython.display import display
+
+import warnings
+warnings.filterwarnings("ignore")
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
 
 from ..care.qt_file_dialog import gui_fname
 from ..care.qt_dir_dialog import gui_dirname
