@@ -211,7 +211,7 @@ class BFListReader(object):
         res = []
         for fn in self.img_fns:
             dims = get_pixel_dimensions(fn)
-            print("  -- ", fn, dims)
+            #print("  -- ", fn, dims)
 
             ir = bf.ImageReader(str(fn))
 
@@ -235,7 +235,7 @@ class BFListReader(object):
 
         for fn in self.img_fns:
             dims = get_pixel_dimensions(fn)
-            print("  -- ", fn, dims)
+            #print("  -- ", fn, dims)
 
             ir = bf.ImageReader(str(fn))
 
@@ -253,8 +253,6 @@ class BFListReader(object):
             yield img
 
             ir.close()
-
-
 
 
 class Timer(object):

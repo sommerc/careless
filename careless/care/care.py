@@ -42,6 +42,9 @@ class GuiParams(dict):
         with open(self.__class__._file, "w") as save_file:
             json.dump(self, save_file)
 
+    def is_loaded(self):
+        return self.__class__._file is not None
+
     def initialize(self):
         self.clear()
         self["in_dir"]  = "."
@@ -62,7 +65,7 @@ params = GuiParams()
 params.initialize()
 
 ### GUI widgets
-def select_project(default_name="./bif_care.json", params=params):
+def select_project(default_name="./careless_care.json", params=params):
     btn_new_proj = widgets.Button(description="New")
     btn_load_proj = widgets.Button(description="Load")
 
@@ -93,6 +96,10 @@ def select_project(default_name="./bif_care.json", params=params):
 
 
 def select_input():
+    if not params.is_loaded():
+         print("Please create or load a project first..")
+         return
+
     ### Input directory
     ###################
     btn_in_dir = widgets.Button(description="Select input folder")
