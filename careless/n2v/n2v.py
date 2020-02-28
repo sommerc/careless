@@ -30,7 +30,7 @@ description = """Careless Noise2Void interface"""
 class GuiParamsN2V(GuiParams):
     def initialize(self):
         self.clear()
-        self['name'] = "bif_n2v"
+        self['name'] = "careless_n2v"
         self["in_dir"]  = "."
         self["glob"] = ""
         self["axes"]   = "ZYX"
@@ -48,7 +48,7 @@ class GuiParamsN2V(GuiParams):
 params = GuiParamsN2V()
 params.initialize()
 
-select_project = partial(select_project, default_name='./bif_n2v.json', params=params)
+select_project = partial(select_project, default_name='./careless_n2v.json', params=params)
 select_train_paramter = partial(select_train_paramter, params=params)
 
 def select_input(params=params):
@@ -394,7 +394,6 @@ def train_predict(n_tiles=(1,4,4), params=params, files=None, headless=False, **
 
 def predict(files, n_tiles=(1,4,4), params=params):
     from n2v.models import N2V
-    from bif_care.utils import BFListReader
 
     files = [f.strip() for f in files.split(";")]
     datagen = BFListReader()
