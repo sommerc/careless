@@ -40,7 +40,7 @@ class GuiParamsN2V(GuiParams):
         self['train_epochs'] = 40
         self['train_steps_per_epoch'] = 100
         self['train_batch_size'] = 16
-        self['n2v_perc_pix'] = 0.198
+        self['n2v_perc_pix'] = 1.5
         self['n2v_patch_shape'] = []
         self['n2v_neighborhood_radius'] = 5
         self['augment'] = False
@@ -52,6 +52,10 @@ select_project = partial(select_project, default_name='./careless_n2v.json', par
 select_train_paramter = partial(select_train_paramter, params=params)
 
 def select_input(params=params):
+    if not params.is_loaded():
+         print("Please create or load a project first..")
+         return
+
     ### Input directory
     ###################
     btn_in_dir = widgets.Button(description="Select input folder")
@@ -230,7 +234,7 @@ def select_n2v_parameter():
 
     ### N2V perc pixel
     ###################
-    float_n2v_perc_pix = widgets.BoundedFloatText(min=0, max=100, step=0.01, value=params['n2v_perc_pix'])
+    float_n2v_perc_pix = widgets.BoundedFloatText(min=0, max=100, step=0.001, value=params['n2v_perc_pix'])
 
     def on_n2v_perc_pix_change(change):
         params['n2v_perc_pix'] = change.new
@@ -404,10 +408,9 @@ def predict(files, n_tiles=(1,4,4), params=params):
 
     assert axes == params["axes"], "The files to predict have different dimensionality: {} != {}".format(axes, params["axes"])
 
-    imgs = datagen.load_imgs_generator()
-
     print("Predicting ...")
     for c in params["train_channels"]:
+        imgs = datagen.load_imgs_generator()
         print("  -- Channel {}".format(c))
 
         img_ch = (im[..., c:c+1] for im in imgs)
@@ -430,7 +433,7 @@ def predict(files, n_tiles=(1,4,4), params=params):
 
             pred = numpy.stack(res_img)
             if "Z" not in params["axes"]:
-                    pred = pred[:, None,     None, ...]
+                    pred = pred[:, None, None, ...]
 
             reso      = (1 / pixel_reso.X, 1 / pixel_reso.Y )
             spacing   = pixel_reso.Z
