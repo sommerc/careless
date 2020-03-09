@@ -183,6 +183,9 @@ class CareTrainer(object):
                 plt.figure(figsize=(12,7))
                 _P = model.keras_model.predict(X_val[:5])
 
+                if self.probabilistic:
+                    _P = _P[..., 0]
+
                 plot_some(X_val[:5], Y_val[:5], _P, pmax=99.5, cmap="gray")
                 plt.suptitle('5 example validation patches\n'
                             'top row: input (source),  '
