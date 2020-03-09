@@ -4,6 +4,7 @@ CAREless.egg-info/
 build/
 dist/
 exp/
+example_data/
 *.pyc
 *.db
 *.tif
