@@ -292,7 +292,7 @@ def select_probabilistic(params=params):
 
     probab = widgets.VBox([widgets.HBox([widgets.Label('Probabilistic', layout={'width':'200px'}), dd_train_proba]),])
 
-    display(widgets.HTML(value="<i><b>experimental</b>, prediction output will contains mean and scale as channels</i>"))
+    display(widgets.HTML(value="<i><b>experimental</b>, prediction output will contain mean and scale as channels</i>"))
     display(probab)
 
 
