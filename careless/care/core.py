@@ -224,6 +224,9 @@ class CareTrainer(object):
             print("Error: Pixel-type not supported. Pixel type must be 8- or 16-bit")
             return
 
+        if self.probabilistic:
+            dtype = numpy.float32
+
         series = 0
         z_size = reader.getSizeZ()
         y_size = reader.getSizeY()
@@ -263,6 +266,7 @@ class CareTrainer(object):
                                         anti_aliasing=True)
 
                 if not self.probabilistic:
+                    # non-probabilistic
                     pred = model.predict(img_3d_ch_ex, axes='ZYX', n_tiles=n_tiles)
                     di = numpy.iinfo(dtype)
                     pred = pred.clip(di.min, di.max).astype(dtype)
@@ -272,8 +276,8 @@ class CareTrainer(object):
                     pred = model.predict_probabilistic( img_3d_ch_ex, axes='ZYX', n_tiles=n_tiles)
                     di = numpy.float32
 
-                    res_image_ch[t, :, 0, :, :] = pred.mean().astype(dtype)
-                    res_image_ch[t, :, 1, :, :] = pred.scale().astype(dtype)
+                    res_image_ch[t, :, 0, :, :] = pred.mean()
+                    res_image_ch[t, :, 1, :, :] = pred.scale()
 
 
                 if False:
