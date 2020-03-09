@@ -58,6 +58,7 @@ class GuiParams(dict):
         self['train_epochs'] = 40
         self['train_steps_per_epoch'] = 100
         self['train_batch_size'] = 16
+        self['probabilistic'] = False
 
 
 
@@ -278,6 +279,20 @@ def select_patch_parameter():
                                 ])
 
     display(patch_parameter)
+
+### Probabilistic
+###################
+def select_probabilistic(params=params):
+    dd_train_proba = widgets.Dropdown(options=[False, True], value=params['probabilistic'])
+
+    def on_dd_train_proba_change(change):
+        params['probabilistic'] = change.new
+
+    dd_train_proba.observe(on_dd_train_proba_change, 'value')
+
+    probab = widgets.VBox([widgets.HBox([widgets.Label('Probabilistic', layout={'width':'200px'}), dd_train_proba]),])
+
+    display(probab)
 
 
 ### Train parameter
