@@ -9,7 +9,7 @@ with open("careless/version.py", "r") as f:
 
 setup(
     name="CAREless",
-    packages=["careless"],
+    packages=["careless", "careless.care", "careless.n2v"],
     version=__version__,
     description=description,
     long_description=description,
