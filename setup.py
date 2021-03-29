@@ -33,7 +33,7 @@ setup(
         "javabridge>=1.0.18",
         "python-bioformats>=1.5.2",
         "jupyterlab>=0.35.6",
-        "tensorflow-gpu==1.13.1,<2.0.0",
+        "tensorflow-gpu>=1.13.1,<2.0.0",
         "h5py<3.0.0",
         "scipy>=1.3.1",
         "keras<2.3.0",
