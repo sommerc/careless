@@ -1,0 +1,12 @@
+name: careless2
+channels:
+  - conda-forge
+dependencies:
+- python=3.9
+- pip
+- cudatoolkit=11.2 
+- cudnn=8.1.0
+- pip:
+  - tensorflow=2.10
+  - n2v
+  - csbdeep

@@ -14,10 +14,10 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 from csbdeep.utils import plot_some
 
-from .qt_file_dialog import gui_fname
-from .qt_dir_dialog import gui_dirname
-from .qt_filesave_dialog import gui_fsavename
-from .qt_files_dialog import gui_fnames
+from .dialogs import gui_fname
+from .dialogs import gui_dirname
+from .dialogs import gui_fsavename
+from .dialogs import gui_fnames
 from .core import CareInputConverter, CareTrainer
 from .utils import get_pixel_dimensions, get_file_list, get_upscale_factors, \
                    check_file_lists, get_space_time_resolution
@@ -74,7 +74,7 @@ def select_project(default_name="./careless_care.json", params=params):
 
     @out_project.capture(clear_output=True, wait=True)
     def btn_btn_new_proj_clicked(btn):
-        new_proj_fn = gui_fsavename(default_name)
+        new_proj_fn = gui_fsavename(title="Create CAREless project", initialfile=default_name,  filetypes=[("JSON", "*.json")])
         if len(new_proj_fn) == 0:
             return
         params.initialize()
@@ -85,7 +85,7 @@ def select_project(default_name="./careless_care.json", params=params):
 
     @out_project.capture(clear_output=True, wait=True)
     def btn_btn_load_proj_clicked(btn):
-        proj_fn = gui_fname()
+        proj_fn = gui_fname(title="Load CAREless project", filetypes=[("JSON", "*.json")])
         if len(proj_fn) == 0:
             return
         params.load(proj_fn)
@@ -107,7 +107,7 @@ def select_input():
     text_in_dir = widgets.Label(params["in_dir"], layout={'border': '1px solid black', "width":"400px"})
 
     def btn_out_in_dir_clicked(btn):
-        dir_name = gui_dirname()
+        dir_name = gui_dirname(title="Choose input directory")
         text_in_dir.value = dir_name
         params["in_dir"] = dir_name
 
@@ -120,7 +120,7 @@ def select_input():
     text_out_dir = widgets.Label(params["out_dir"], layout={'border': '1px solid black', "width":"400px"})
 
     def btn_out_out_dir_clicked(btn):
-        dir_name = gui_dirname()
+        dir_name = gui_dirname(title="Choose input directory")
         text_out_dir.value = dir_name
         params["out_dir"] = dir_name
 
@@ -349,9 +349,9 @@ def select_file_to_predict():
 
     @out_predict_fn.capture(clear_output=True, wait=True)
     def btn_predict_file_clicked(btn):
-        predict_fn = gui_fnames()
+        predict_fn = gui_fnames(title="Select images to predcit")
         #print(predict_fn)
-        text_predict_fn.value = predict_fn.replace(";", ";\n")
+        text_predict_fn.value = "\n".join(predict_fn)
 
 
     btn_predict_file.on_click(btn_predict_file_clicked)

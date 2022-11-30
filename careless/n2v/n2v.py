@@ -19,11 +19,8 @@ import tensorflow as tf
 
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
+from ..care.dialogs import gui_dirname
 
-from ..care.qt_file_dialog import gui_fname
-from ..care.qt_dir_dialog import gui_dirname
-from ..care.qt_files_dialog import gui_fnames
-from ..care.qt_filesave_dialog import gui_fsavename
 from ..care.utils import (
     BFListReader,
     get_pixel_dimensions,
@@ -83,7 +80,7 @@ def select_input(params=params):
     )
 
     def btn_out_in_dir_clicked(btn):
-        dir_name = gui_dirname()
+        dir_name = gui_dirname(title="Choose input directory")
         text_in_dir.value = dir_name
         params["in_dir"] = dir_name
 
