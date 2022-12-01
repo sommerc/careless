@@ -1,4 +1,4 @@
-name: careless3
+name: careless
 channels:
   - conda-forge
 dependencies:
