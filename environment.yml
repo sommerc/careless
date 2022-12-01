@@ -1,4 +1,4 @@
-name: careless2
+name: careless3
 channels:
   - conda-forge
 dependencies:
@@ -10,4 +10,11 @@ dependencies:
   - tensorflow==2.10
   - n2v
   - csbdeep
+  - scikit_image
+  - tifffile
+  - ipywidgets
+  - python-javabridge
+  - python-bioformats
+  - jupyterlab
   - git+https://github.com/sommerc/careless.git
+

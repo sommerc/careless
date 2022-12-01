@@ -23,14 +23,5 @@ setup(
     },
     author="Christoph Sommer",
     author_email="christoph.sommer23@gmail.com",
-    install_requires=[
-        "scikit_image",
-        "tifffile",
-        "ipywidgets",
-        "javabridge",
-        "python-bioformats",
-        "jupyterlab",
-        "scipy",
-    ],
 )
 
