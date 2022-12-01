@@ -32,7 +32,7 @@ Verify the installation by:
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
 ### Vanilla screencast for input selection and training
-![CAREless user interface](vid/bif_care_demo_01.mp4)
+[CAREless user interface](vid/bif_care_demo_01.mp4)
 
 ### Input selection and patch extraction
 0. Clone this repository with `git clone https://github.com/sommerc/careless`
