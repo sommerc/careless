@@ -90,6 +90,11 @@ class JVM(object):
                         args=["-Dlog4j.configuration=file:{}".format(self.log_config),],
                         run_headless=True)
             JVM.started = True
+            myloglevel = "ERROR"
+            rootLoggerName = jv.get_static_field("org/slf4j/Logger","ROOT_LOGGER_NAME", "Ljava/lang/String;")
+            rootLogger = jv.static_call("org/slf4j/LoggerFactory","getLogger", "(Ljava/lang/String;)Lorg/slf4j/Logger;", rootLoggerName)
+            logLevel = jv.get_static_field("ch/qos/logback/classic/Level",myloglevel, "Lch/qos/logback/classic/Level;")
+            jv.call(rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V", logLevel)
 
     def shutdown(self):
         if JVM.started:
