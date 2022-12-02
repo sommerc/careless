@@ -443,8 +443,12 @@ def train_predict(
         imgs_for_patches = datagen.load_imgs_generator()
         imgs_for_predict = datagen.load_imgs_generator()
 
-        img_ch = (im[..., c : c + 1] for im in imgs_for_patches)
+        img_ch = [im[..., c : c + 1] for im in imgs_for_patches]
         img_ch_predict = (im[..., c : c + 1] for im in imgs_for_predict)
+
+        if img_ch[0].shape[-1] == 0:
+            print(f"WARNING: Channel {c} does not exist. skipping....")
+            continue
 
         npatches = (
             params["n_patches_per_image"] if params["n_patches_per_image"] > 1 else None
