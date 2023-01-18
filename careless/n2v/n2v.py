@@ -164,8 +164,10 @@ def select_input(params=params):
 
             params["train_channels"] = list(range(pix_dim.c))
 
-            text_convert_repy.value = "Using Noise2void in {}D mode with {} channels".format(
-                len(params["axes"]), pix_dim.c
+            text_convert_repy.value = (
+                "Using Noise2void in {}D mode with {} channels".format(
+                    len(params["axes"]), pix_dim.c
+                )
             )
 
     btn_convert.on_click(btn_convert_clicked)
@@ -650,8 +652,12 @@ def cmd_line():
     if model_name is not None:
         params["name"] = model_name[0]
 
-    train_predict(params=params, files=files, n_tiles=tuple(args.ntiles), headless=True)
-
-    JVM().shutdown()
+    try:
+        train_predict(
+            params=params, files=files, n_tiles=tuple(args.ntiles), headless=True
+        )
+    except:
+        raise
+    finally:
+        JVM().shutdown()
     sys.exit(0)
-
