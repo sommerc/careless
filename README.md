@@ -14,7 +14,10 @@ conda activate careless
 ```
 
 ## Windows 
-You will need to install the [Microsoft Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) prior to the conda installation. 
+You will need to install the *Microsoft Visual Studio C++ Build Tools* and the *Windows 10 SDK* prior to the conda installation. In the Visual Studio (Community) installer, select individual components and check
+
+* MSVC v143 - VS 2022 C++ x64/x86 build tool...
+* Windows 10 SDK (10.0.20348.0)
 
 ## Linux 
 
