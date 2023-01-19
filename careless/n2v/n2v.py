@@ -618,7 +618,7 @@ def predict(files, n_tiles=(1, 4, 4), params=params):
 def cmd_line():
     import argparse
 
-    description = """CAREless Noise2Void: command line script for predicting new images given existing project."""
+    description = """CAREless Noise2Void: command line script for training and predicting new images given existing careless project (.json)."""
 
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
