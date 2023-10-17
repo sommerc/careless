@@ -100,7 +100,6 @@ class CareInputConverter(object):
                             conv_scaling,
                             preserve_range=True,
                             order=self.order,
-                            multichannel=False,
                             mode="reflect",
                             anti_aliasing=True,
                         )
@@ -354,7 +353,6 @@ class CareTrainer(object):
                     self.low_scaling,
                     preserve_range=True,
                     order=self.order,
-                    multichannel=False,
                     mode="reflect",
                     anti_aliasing=True,
                 )
