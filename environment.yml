@@ -13,8 +13,9 @@ dependencies:
   - tensorflow==2.10
   - n2v
   - csbdeep
-  - scikit_image
+  - scikit-image
   - tifffile
+  - pandas
   - ipywidgets
   - python-javabridge
   - python-bioformats

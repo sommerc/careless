@@ -6,6 +6,7 @@ import numpy
 import pathlib
 import argparse
 import tifffile
+import pandas as pd
 import javabridge as jv
 import bioformats as bf
 from collections import namedtuple
@@ -75,7 +76,6 @@ class CareInputConverter(object):
             t_size = reader.getSizeT()
 
             for t in range(t_size):
-
                 img_3d = numpy.zeros((z_size, c_size, y_size, x_size), dtype=dtype)
                 for z in range(z_size):
                     for c in range(c_size):
@@ -168,7 +168,6 @@ class CareTrainer(object):
                     normalization=normalization,
                 )
             else:
-
                 X, Y, XY_axes = create_patches(
                     raw_data=raw_data,
                     patch_size=self.patch_size,
@@ -199,7 +198,6 @@ class CareTrainer(object):
             channels = self.train_channels
 
         with Timer("Training"):
-
             for ch in channels:
                 print("-- Training channel {}...".format(ch))
                 (X, Y), (X_val, Y_val), axes = load_training_data(
@@ -255,6 +253,10 @@ class CareTrainer(object):
                 plot_history(
                     history, ["loss", "val_loss"], ["mse", "val_mse", "mae", "val_mae"]
                 )
+
+                hist_df = pd.DataFrame(history.history)
+
+                hist_df.to_csv(f"{self.out_dir}/CH_{ch}_training_log.csv")
 
                 plt.figure(figsize=(12, 7))
                 _P = model.keras_model.predict(X_val[:5])
@@ -483,4 +485,3 @@ def cmd_line():
         bt.predict(fn, n_tiles=args.ntiles)
 
     JVM().shutdown()
-
