@@ -256,7 +256,7 @@ class CareTrainer(object):
 
                 hist_df = pd.DataFrame(history.history)
 
-                hist_df.to_csv(f"{self.out_dir}/CH_{ch}_training_log.csv")
+                hist_df.to_csv(f"{self.out_dir}/models/CH_{ch}_training_log.csv")
 
                 plt.figure(figsize=(12, 7))
                 _P = model.keras_model.predict(X_val[:5])
