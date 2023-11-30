@@ -315,9 +315,9 @@ class CareTrainer(object):
         c_size = reader.getSizeC()
         t_size = reader.getSizeT()
 
-        z_out_size = int(z_size * self.low_scaling[0])
-        y_out_size = int(y_size * self.low_scaling[1])
-        x_out_size = int(x_size * self.low_scaling[2])
+        z_out_size = int(numpy.round(z_size * self.low_scaling[0]))
+        y_out_size = int(numpy.round(y_size * self.low_scaling[1]))
+        x_out_size = int(numpy.round(x_size * self.low_scaling[2]))
 
         if c_size != len(self.train_channels):
             print(
