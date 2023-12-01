@@ -12,7 +12,7 @@ import bioformats as bf
 from collections import namedtuple
 from matplotlib import pyplot as plt
 from skimage.transform import rescale
-from tqdm import tqdm_notebook as tqdm
+from tqdm.auto import tqdm
 
 from functools import partial
 
@@ -38,6 +38,7 @@ from .utils import (
     get_upscale_factors,
     get_space_time_resolution,
     Timer,
+    check_file_lists,
 )
 
 
@@ -122,8 +123,9 @@ class CareInputConverter(object):
 
 
 class CareTrainer(object):
-    def __init__(self, **params):
+    def __init__(self, headless=False, **params):
         self.order = 0
+        self.headless = headless
 
         if len(params) == 0:
             from .care import params
@@ -177,14 +179,15 @@ class CareTrainer(object):
                     verbose=False,
                 )
 
-            plt.figure(figsize=(16, 4))
+            if not self.headless:
+                plt.figure(figsize=(16, 4))
 
-            rand_sel = numpy.random.randint(low=0, high=len(X), size=6)
-            plot_some(
-                X[rand_sel, 0], Y[rand_sel, 0], title_list=[range(6)], cmap="gray"
-            )
+                rand_sel = numpy.random.randint(low=0, high=len(X), size=6)
+                plot_some(
+                    X[rand_sel, 0], Y[rand_sel, 0], title_list=[range(6)], cmap="gray"
+                )
 
-            plt.show()
+                plt.show()
 
         print("Done")
         return
@@ -248,31 +251,32 @@ class CareTrainer(object):
                     )
                     return
 
-                # print(sorted(list(history.history.keys())))
-                plt.figure(figsize=(16, 5))
-                plot_history(
-                    history, ["loss", "val_loss"], ["mse", "val_mse", "mae", "val_mae"]
-                )
-
                 hist_df = pd.DataFrame(history.history)
-
                 hist_df.to_csv(f"{self.out_dir}/models/CH_{ch}_training_log.csv")
 
-                plt.figure(figsize=(12, 7))
-                _P = model.keras_model.predict(X_val[:5])
+                if not self.headless:
+                    plt.figure(figsize=(16, 5))
+                    plot_history(
+                        history,
+                        ["loss", "val_loss"],
+                        ["mse", "val_mse", "mae", "val_mae"],
+                    )
 
-                if self.probabilistic:
-                    _P = _P[..., 0]
+                    plt.figure(figsize=(12, 7))
+                    _P = model.keras_model.predict(X_val[:5])
 
-                plot_some(X_val[:5], Y_val[:5], _P, pmax=99.5, cmap="gray")
-                plt.suptitle(
-                    "5 example validation patches\n"
-                    "top row: input (source),  "
-                    "middle row: target (ground truth),  "
-                    "bottom row: predicted from source"
-                )
+                    if self.probabilistic:
+                        _P = _P[..., 0]
 
-                plt.show()
+                    plot_some(X_val[:5], Y_val[:5], _P, pmax=99.5, cmap="gray")
+                    plt.suptitle(
+                        "5 example validation patches\n"
+                        "top row: input (source),  "
+                        "middle row: target (ground truth),  "
+                        "bottom row: predicted from source"
+                    )
+
+                    plt.show()
 
                 print("-- Export model for use in Fiji...")
                 model.export_TF()
@@ -396,7 +400,7 @@ class CareTrainer(object):
             ch_out_fn = os.path.join(
                 os.path.dirname(file_fn),
                 os.path.splitext(os.path.basename(file_fn))[0]
-                + "_care_predict_ch{}.tif".format(ch),
+                + "_care_predict_ch{}.tiff".format(ch),
             )
             print(
                 " -- Saving channel {} CARE prediction to file '{}'".format(
@@ -432,10 +436,6 @@ class CareTrainer(object):
 
 
 def get_args():
-    """
-    Helper function for the argument parser.
-    """
-
     description = """CAREless care: command line script for predicting new images given existing project."""
 
     parser = argparse.ArgumentParser(description=description)
@@ -456,7 +456,27 @@ def get_args():
     return args
 
 
-def cmd_line():
+def cmd_line_predict():
+    def get_args():
+        description = """CAREless Care: Command line script for predicting new images given a existing project (.json) """
+
+        parser = argparse.ArgumentParser(description=description)
+
+        # Add arguments
+        parser.add_argument(
+            "--care_project",
+            type=str,
+            nargs=1,
+            help="CAREless care project file (.json)",
+            required=True,
+        )
+        parser.add_argument("files", type=str, nargs="+", help="Files to predict")
+        parser.add_argument("--ntiles", nargs=3, type=int, default=[1, 8, 8])
+
+        args = parser.parse_args()
+
+        return args
+
     from .care import GuiParams
 
     args = get_args()
@@ -483,5 +503,94 @@ def cmd_line():
     bt = CareTrainer(**params)
     for fn in args.files:
         bt.predict(fn, n_tiles=args.ntiles)
+
+    JVM().shutdown()
+
+
+def cmd_line_train():
+    def get_args():
+        description = """CAREless Care: Command line script for training given a existing project (.json) """
+
+        parser = argparse.ArgumentParser(description=description)
+
+        # Add arguments
+        parser.add_argument(
+            "--care_project",
+            type=str,
+            nargs=1,
+            help="CAREless care project file (.json)",
+            required=True,
+        )
+
+        args = parser.parse_args()
+
+        return args
+
+    from .care import GuiParams
+
+    args = get_args()
+    assert os.path.exists(
+        args.care_project[0]
+    ), f"Project file '{args.care_project[0]}'' does not exist."
+
+    params = GuiParams()
+    params.load(args.care_project[0])
+
+    print("\n\nCAREless care parameters")
+    print("-" * 50)
+    for k, v in params.items():
+        print("{:25s}: {}".format(k, v))
+
+    print("\n")
+
+    check_ok, msg = check_file_lists(
+        params["in_dir"], params["low_wc"], params["high_wc"]
+    )
+    if not check_ok:
+        print(msg)
+        return
+
+    params["low_scaling"] = get_upscale_factors(
+        params["in_dir"], params["low_wc"], params["high_wc"]
+    )
+
+    z_dim = get_pixel_dimensions(get_file_list(params["in_dir"], params["low_wc"])[0]).z
+
+    if z_dim == 1:
+        params["axes"] = "YX"
+    else:
+        params["axes"] = "ZYX"
+
+    print("Using CARE in {}D mode".format(len(params["axes"])))
+
+    if (numpy.array(params["low_scaling"]) == 1).all():
+        print("Low quality images match high quality resolution")
+    else:
+        print(
+            "Low quality images are scaled up by ({}, {}, {}) in ZYX to match high quality resolution".format(
+                *params["low_scaling"]
+            )
+        )
+
+    CareInputConverter(
+        in_dir=params["in_dir"],
+        out_dir=params["out_dir"],
+        low_wc=params["low_wc"],
+        high_wc=params["high_wc"],
+    ).convert()
+
+    params.save()
+    trainer = CareTrainer(headless=True, **params)
+    trainer.create_patches()
+    trainer.train()
+
+    # for fn in args.files:
+    #     assert os.path.exists(fn), f"File for prediction {fn} does not exist"
+
+    # print("Predicting Careless...")
+
+    # bt = CareTrainer(**params)
+    # for fn in args.files:
+    #     bt.predict(fn, n_tiles=args.ntiles)
 
     JVM().shutdown()

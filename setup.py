@@ -18,10 +18,10 @@ setup(
     entry_points={
         "console_scripts": [
             "careless_n2v=careless.n2v.n2v:cmd_line",
-            "careless_Care=careless.care.core:cmd_line",
+            "careless_care_predict=careless.care.core:cmd_line_predict",
+            "careless_care_train=careless.care.core:cmd_line_train",
         ]
     },
     author="Christoph Sommer",
     author_email="christoph.sommer23@gmail.com",
 )
-

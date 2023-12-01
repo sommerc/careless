@@ -42,11 +42,11 @@ def get_space_time_resolution(img_path):
         Z_res_unit = "pixel"
 
     # check for \mu in string (argh)
-    if '\xb5' in X_res_unit:
+    if "\xb5" in X_res_unit:
         X_res_unit = "micron"
         Y_res_unit = "micron"
 
-    if '\xb5' in Z_res_unit:
+    if "\xb5" in Z_res_unit:
         Z_res_unit = "micron"
 
     i.Pixels.get_PhysicalSizeZUnit()
@@ -68,15 +68,16 @@ def get_space_time_resolution(img_path):
             if axes == "Z":
                 stride_t *= Z
 
-        t_end = stride_t * (T-1)
+        t_end = stride_t * (T - 1)
 
-        print(i.Pixels.get_plane_count(),  t_end)
+        print(i.Pixels.get_plane_count(), t_end)
         t_end_plane = i.Pixels.Plane(t_end)
 
         frame_interval = t_end_plane.DeltaT / T
 
-    return Reso(X_res, Y_res, Z_res, frame_interval, X_res_unit, Y_res_unit, Z_res_unit, Tunit)
-
+    return Reso(
+        X_res, Y_res, Z_res, frame_interval, X_res_unit, Y_res_unit, Z_res_unit, Tunit
+    )
 
 
 class JVM(object):
@@ -85,21 +86,39 @@ class JVM(object):
 
     def start(self):
         if not JVM.started:
-            jv.start_vm(class_path=bf.JARS,
-                        max_heap_size='8G',
-                        args=["-Dlog4j.configuration=file:{}".format(self.log_config),],
-                        run_headless=True)
+            jv.start_vm(
+                class_path=bf.JARS,
+                max_heap_size="8G",
+                args=[
+                    "-Dlog4j.configuration=file:{}".format(self.log_config),
+                ],
+                run_headless=True,
+            )
             JVM.started = True
             myloglevel = "ERROR"
-            rootLoggerName = jv.get_static_field("org/slf4j/Logger","ROOT_LOGGER_NAME", "Ljava/lang/String;")
-            rootLogger = jv.static_call("org/slf4j/LoggerFactory","getLogger", "(Ljava/lang/String;)Lorg/slf4j/Logger;", rootLoggerName)
-            logLevel = jv.get_static_field("ch/qos/logback/classic/Level",myloglevel, "Lch/qos/logback/classic/Level;")
-            jv.call(rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V", logLevel)
+            rootLoggerName = jv.get_static_field(
+                "org/slf4j/Logger", "ROOT_LOGGER_NAME", "Ljava/lang/String;"
+            )
+            rootLogger = jv.static_call(
+                "org/slf4j/LoggerFactory",
+                "getLogger",
+                "(Ljava/lang/String;)Lorg/slf4j/Logger;",
+                rootLoggerName,
+            )
+            logLevel = jv.get_static_field(
+                "ch/qos/logback/classic/Level",
+                myloglevel,
+                "Lch/qos/logback/classic/Level;",
+            )
+            jv.call(
+                rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V", logLevel
+            )
 
     def shutdown(self):
         if JVM.started:
             jv.kill_vm()
             JVM.started = False
+
 
 def get_pixel_dimensions(fn):
     JVM().start()
@@ -115,39 +134,67 @@ def get_pixel_dimensions(fn):
     ir.close()
     return Axes(t_size, z_size, c_size, y_size, x_size)
 
+
 def get_file_list(in_dir, glob):
     assert os.path.exists(in_dir), "Folder '{}' does not exist".format(in_dir)
-    return sorted(list( pathlib.Path(in_dir).glob(glob)))
+    return sorted(list(pathlib.Path(in_dir).glob(glob)))
+
 
 def check_file_lists(in_dir, low_wc, high_wc):
     from fnmatch import translate
-    fl_low  = get_file_list(in_dir, low_wc)
+
+    fl_low = get_file_list(in_dir, low_wc)
     fl_high = get_file_list(in_dir, high_wc)
 
     if len(fl_low) == 0:
         return False, "No files selected"
 
     if len(fl_low) != len(fl_high):
-        return False, "Number of files does not match {} != {}".format(len(fl_low), len(fl_high))
+        return (
+            False,
+            "Number of files does not match {} != {}\nLow:\n - {}\nHigh:\n - {}".format(
+                len(fl_low),
+                len(fl_high),
+                "\n - ".join(map(str, fl_low)),
+                "\n - ".join(map(str, fl_high)),
+            ),
+        )
 
     for fl, fh in zip(fl_low, fl_high):
         if os.path.splitext(fl.name)[1] != os.path.splitext(fh.name)[1]:
             return False, "Extensions do not match"
 
-        dim_low  = get_pixel_dimensions(fl)
+        dim_low = get_pixel_dimensions(fl)
         dim_high = get_pixel_dimensions(fh)
 
         if dim_low.c != dim_high.c:
-            return False, "Low and high quality images have different channels\n '{}' != '{}'".format(fl, fh)
+            return (
+                False,
+                "Low and high quality images have different channels\n '{}' != '{}'".format(
+                    fl, fh
+                ),
+            )
 
         if dim_low.t != dim_high.t:
-            return False, "Low and high quality images have different number of time points\n '{}' != '{}'".format(fl, fh)
+            return (
+                False,
+                "Low and high quality images have different number of time points\n '{}' != '{}'".format(
+                    fl, fh
+                ),
+            )
 
-        if (dim_low.x > dim_high.x) or \
-           (dim_low.y > dim_high.y) or \
-           (dim_low.z > dim_high.z):
-           print(fl)
-           return False, "Low quality images have higher spatial resolution e.g. '{}'".format(fl)
+        if (
+            (dim_low.x > dim_high.x)
+            or (dim_low.y > dim_high.y)
+            or (dim_low.z > dim_high.z)
+        ):
+            print(fl)
+            return (
+                False,
+                "Low quality images have higher spatial resolution e.g. '{}'".format(
+                    fl
+                ),
+            )
 
     return True, "OK"
 
@@ -156,13 +203,10 @@ def get_upscale_factors(in_dir, low_wc, high_wc):
     low_fl = get_file_list(in_dir, low_wc)
     high_fl = get_file_list(in_dir, high_wc)
 
-    low_dim  = get_pixel_dimensions(str(low_fl[0]))
+    low_dim = get_pixel_dimensions(str(low_fl[0]))
     high_dim = get_pixel_dimensions(str(high_fl[0]))
 
-    return (high_dim.z / low_dim.z,
-            high_dim.y / low_dim.y,
-            high_dim.x / low_dim.x)
-
+    return (high_dim.z / low_dim.z, high_dim.y / low_dim.y, high_dim.x / low_dim.x)
 
 
 class BFListReader(object):
@@ -174,8 +218,10 @@ class BFListReader(object):
         self.path = path
         self.glob_flt = glob_flt
 
-        assert os.path.exists(self.path), "Input folder '{}' does not exist".format(self.path)
-        self.img_fns = sorted(list( pathlib.Path(self.path).glob(self.glob_flt)))
+        assert os.path.exists(self.path), "Input folder '{}' does not exist".format(
+            self.path
+        )
+        self.img_fns = sorted(list(pathlib.Path(self.path).glob(self.glob_flt)))
 
     def from_file_list(self, img_fns):
         for f in img_fns:
@@ -190,13 +236,13 @@ class BFListReader(object):
         res = ""
         dims = get_pixel_dimensions(img_fn)
         if dims.t > 1:
-            res+="T"
+            res += "T"
         if dims.c > 1:
-            res+="C"
+            res += "C"
         if dims.z > 1:
-            res+="Z"
+            res += "Z"
 
-        res+="YX"
+        res += "YX"
         return res
 
     def check_dims_equal(self):
@@ -205,7 +251,9 @@ class BFListReader(object):
             dim = self.get_axes(fn)
             dims.append(dim)
 
-        assert dims.count(dims[0]) == len(dims), "Dimensions of image files do not match: " + ", ".join(dims)
+        assert dims.count(dims[0]) == len(
+            dims
+        ), "Dimensions of image files do not match: " + ", ".join(dims)
 
         self.axes = dims[0]
         return dims[0]
@@ -216,7 +264,7 @@ class BFListReader(object):
         res = []
         for fn in self.img_fns:
             dims = get_pixel_dimensions(fn)
-            #print("  -- ", fn, dims)
+            # print("  -- ", fn, dims)
 
             ir = bf.ImageReader(str(fn))
 
@@ -224,10 +272,9 @@ class BFListReader(object):
             for t in range(dims.t):
                 for z in range(dims.z):
                     for c in range(dims.c):
-                        img[t, z, :, :, c] = ir.read(series=0,
-                                                    z=z,
-                                                    c=c,
-                                                    t=t, rescale=False)
+                        img[t, z, :, :, c] = ir.read(
+                            series=0, z=z, c=c, t=t, rescale=False
+                        )
 
             if "Z" not in axes:
                 img = img[:, 0, ...]
@@ -240,7 +287,7 @@ class BFListReader(object):
 
         for fn in self.img_fns:
             dims = get_pixel_dimensions(fn)
-            #print("  -- ", fn, dims)
+            # print("  -- ", fn, dims)
 
             ir = bf.ImageReader(str(fn))
 
@@ -248,10 +295,9 @@ class BFListReader(object):
             for t in range(dims.t):
                 for z in range(dims.z):
                     for c in range(dims.c):
-                        img[t, z, :, :, c] = ir.read(series=0,
-                                                    z=z,
-                                                    c=c,
-                                                    t=t, rescale=False)
+                        img[t, z, :, :, c] = ir.read(
+                            series=0, z=z, c=c, t=t, rescale=False
+                        )
 
             if "Z" not in axes:
                 img = img[:, 0, ...]
@@ -269,9 +315,7 @@ class Timer(object):
 
     def __exit__(self, type, value, traceback):
         if self.name:
-            print('[%s]' % self.name,)
-        print('Elapsed: %s sec.' % (time.time() - self.tstart))
-
-
-
-
+            print(
+                "[%s]" % self.name,
+            )
+        print("Elapsed: %s sec." % (time.time() - self.tstart))
