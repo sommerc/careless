@@ -51,7 +51,7 @@ The training of a neural network is done iteratively in `epochs`. In each epoch,
 ## CARE in command line
 Training and predictions of CARE*less* CARE can also be done in the command line. You will need to have a CARE*less* settings file in .json format
 
-```json
+```python
 {
     "in_dir": "<path-to-input-images>",
     "out_dir": "<path-to-result-model>",
