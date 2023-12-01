@@ -53,8 +53,8 @@ Training and predictions of CARE*less* CARE can also be done in the command line
 
 ```python
 {
-    "in_dir": "<path-to-input-images>",
-    "out_dir": "<path-to-result-model>",
+    "in_dir": "<path-to-input-images>",  # path to image pairs
+    "out_dir": "<path-to-result-model>", # path to store CARE models 
     "low_wc": "*low*",    # a wild-card expression to select the low-quality images from in_dir 
     "high_wc": "*high*",  # a wild-card expression to select the high-quality images from in_dir 
     "axes": "ZYX",        # ZYX for 3D YX for 2D 
