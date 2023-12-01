@@ -31,7 +31,7 @@ Verify the installation by:
 
 # How to use:
 ---
-## CARE
+## CARE in Jupyter
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
 ### Vanilla screencast for input selection and training
@@ -48,6 +48,41 @@ The training of a neural network is done iteratively in `epochs`. In each epoch,
 
 4. Select training parameters and execute training code block.
 
+## CARE in command line
+Training and predictions of CARE*less* CARE can also be done in the command line. You will need to have a CARE*less* settings file in .json format
+
+```json
+{
+    "in_dir": "<path-to-input-images>",
+    "out_dir": "<path-to-result-model>",
+    "low_wc": "*low*",    # a wild-card expression to select the low-quality images from in_dir 
+    "high_wc": "*high*",  # a wild-card expression to select the high-quality images from in_dir 
+    "axes": "ZYX",        # ZYX for 3D YX for 2D 
+    "patch_size": [8, 64, 64],   # patch sizes
+    "n_patches_per_image": 128,  # number of patches
+    "train_channels": [0, 1],    # channels to train (and predict)
+    "train_epochs": 7,           # training epochs
+    "train_steps_per_epoch": 10, # training steps per epoch
+    "train_batch_size": 32,      # training batch-size
+    "probabilistic": false,      # probabilistic CARE?     
+    "name": "my-care-test",      # choose model name 
+    "low_scaling": [2.0, 1.992, 2.0] # the up-scaling (inferred automatically in training)
+}
+``` 
+*careless_care.json*
+
+### Training
+To train type:
+
+`careless_care_train --care_project careless_care.json`
+
+### Prediction
+To CARE-predict one or more low quality image type:
+
+`careless_care_predict --care_project careless_care.json low_quality_new.tif <more-images>`
+
+---
+---
 
 ## Noise2Void
 
