@@ -29,9 +29,8 @@ Verify the installation by:
 
 `python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"`
 
-# How to use:
----
-## CARE in Jupyter
+# CARE in Jupyter
+
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
 ### Vanilla screencast for input selection and training
@@ -48,7 +47,8 @@ The training of a neural network is done iteratively in `epochs`. In each epoch,
 
 4. Select training parameters and execute training code block.
 
-## CARE in command line
+# CARE in command line
+
 Training and predictions of CARE*less* CARE can also be done in the command line. You will need to have a CARE*less* settings file in .json format
 
 ```python
@@ -79,17 +79,51 @@ To train type:
 ### Prediction
 To CARE-predict one or more low quality image type:
 
-`careless_care_predict --care_project careless_care.json low_quality_new.tif <more-images>`
+`careless_care_predict --care_project careless_care.json --ntiles 2 8 8 low_quality_new.tif <more-images>`
+
+Due to memory GPU limitations CARE can be predicted tile-wise. The `ntiles` parameter sets the number of tiles per axis *ZYX* (default 1 4 4)
 
 ---
----
 
-## Noise2Void
+
+# Noise2Void in Jupyter
 
 Noise2void does not require pairs of images.
 1. Copy and rename the IPython notebook template file: `careless_n2v.ipynb` to `my_n2v_project.ipynb`
 2. Open your renamed `my_n2v_project.ipynb` file in Jupyter Lab.
 3. Follow steps in the notebook
+
+# Noise2Void in command line
+
+Training and prediction with Noise2void can be done using the noise2void settings file in .json format
+
+```python
+{
+    "name": "my-n2v-exp",         # N2Vmodel name 
+    "in_dir": "<path-to-images>", # path to images
+    "glob": "*.tif",              # wild-card selection
+    "axes": "YX",                 # 2D (XY) or 3D (ZYX)
+    "patch_size": [128, 128],     # path sizes
+    "n_patches_per_image": -1,    # how many patches, use -1 for all
+    "train_channels": [0, 1],     # channels to use
+    "train_epochs": 40,           # training epochs
+    "train_steps_per_epoch": 400, # training steps per epoch
+    "train_batch_size": 16,       # training batch-size
+    "n2v_perc_pix": 0.016,        # N2V default parameters 
+    "n2v_patch_shape": [],        #  ~ 
+    "n2v_neighborhood_radius": 5, #  ~
+    "augment": true               # Augment training 8-fold by flips/rotations
+}
+```
+*careless_n2v.json*
+
+### Train and predict
+To train and predict the images selected in `in_dir` type:
+
+`careless_n2v --n2v_project careless_n2v.json --ntiles`
+
+Optionally you can use the parameter `--model_name <my_name>` to overwrite the `name` given in the settings .json file
+
 
 # Example data
 The authors of [CARE](https://github.com/CSBDeep/CSBDeep/tree/master/examples) provide example data from different modalities.
