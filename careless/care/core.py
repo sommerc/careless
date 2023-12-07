@@ -283,7 +283,7 @@ class CareTrainer(object):
                 print("Done")
 
     def predict_multiple(self, file_fns, n_tiles=(1, 4, 4), keep_meta=True):
-        file_list = file_fns.split(";")
+        file_list = file_fns.split("\n")
         for file_fn in file_list:
             self.predict(file_fn.strip(), n_tiles=n_tiles, keep_meta=keep_meta)
 
