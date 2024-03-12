@@ -14,10 +14,13 @@ conda activate careless
 ```
 
 ## Windows 
-You will need to install the *Microsoft Visual Studio C++ Build Tools* and the *Windows 10 SDK* prior to the conda installation. In the Visual Studio (Community) installer, select individual components and check
+You will need to install the *Microsoft Visual Studio C++ Build Tools* and the *Windows 10 SDK* prior to the conda installation. In the Visual Studio (Community) installer, select [individual components](https://seafile.ist.ac.at/f/029e5e1ca96b41f19e44/) and check:
 
 * MSVC v143 - VS 2022 C++ x64/x86 build tool...
 * Windows 10 SDK (10.0.20348.0)
+
+> :warning:  Both are required to build the bioformats extension
+
 
 ## Linux 
 
