@@ -8,6 +8,8 @@ We strongly recommend using the [Anaconda Python distribution (64bit)](https://w
 
 You can install CAREless and dependencies into a new conda environment by:
 
+Download the `environment.yml` from this repository, then:
+
 ```
 conda env create -f environment.yml
 conda activate careless
@@ -32,7 +34,19 @@ Verify the installation by:
 
 `python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"`
 
+This should output your GPU device.
+
 # CARE in Jupyter
+
+### Download notebooks
+Download the care and n2v notebook from the notebooks folder of this repository. Then you can start jupyterlab by:
+
+```
+# conda activate careless
+jupyter lab <notebooks-folder>
+```
+
+This should open your browser with the jupyterlab IDE. Now you can select the care or the n2v notebook.
 
 CARE needs pairs of registered images - low (input) and high (output) quality. It trains a convolutional neural network how to transform low quality images - which might even be of less physical resolution - into high quality images. After training, newly recorded low quality images or movies can be predicted. 2D, 3D and multi-channel images are supported. For each channel a separate network is trained.
 
@@ -40,10 +54,7 @@ CARE needs pairs of registered images - low (input) and high (output) quality. I
 [CAREless user interface](vid/bif_care_demo_01.mp4)
 
 ### Input selection and patch extraction
-0. Clone this repository with `git clone https://github.com/sommerc/careless`
-1. Copy and rename the IPython notebook template file: `careless_care.ipynb` to `my_care_project.ipynb`
-2. Open your renamed `my_care_project.ipynb` file in Jupyter Lab.
-3. In order to train CARE, the path to the image pairs needs to be specified. Then, choose images for low and high quality respectively using a wild-card (e.g. `low*.tif` and `high*.tif`). The images will be converted and image patches are extracted. This step is required for efficient GPU execution. Choose patch sizes for your input dimensions `(Z)YX` and set how many patches should be extracted per image pair. After image patches have been extracted, they are saved to the output directory.
+In order to train CARE, the path to the image pairs needs to be specified. Then, choose images for low and high quality respectively using a wild-card (e.g. `low*.tif` and `high*.tif`). The images will be converted and image patches are extracted. This step is required for efficient GPU execution. Choose patch sizes for your input dimensions `(Z)YX` and set how many patches should be extracted per image pair. After image patches have been extracted, they are saved to the output directory.
 
 ### Training the network
 The training of a neural network is done iteratively in `epochs`. In each epoch, the network weights' are updated by optimizing a loss function on `steps_per_epoch` batches of image patches. The size of the batches is given by `batch_size`. To make use of all your image data, select `steps_per_epoch = #patches / batch_size`. Per default, 10% of patches are used for validation and not used in training.
@@ -91,10 +102,7 @@ Due to memory GPU limitations CARE can be predicted tile-wise. The `ntiles` para
 
 # Noise2Void in Jupyter
 
-Noise2void does not require pairs of images.
-1. Copy and rename the IPython notebook template file: `careless_n2v.ipynb` to `my_n2v_project.ipynb`
-2. Open your renamed `my_n2v_project.ipynb` file in Jupyter Lab.
-3. Follow steps in the notebook
+Noise2void does not require pairs of images. Just follow the steps in the notebook.
 
 # Noise2Void in command line
 
@@ -126,7 +134,6 @@ To train and predict the images selected in `in_dir` type:
 `careless_n2v --n2v_project careless_n2v.json --ntiles`
 
 Optionally you can use the parameter `--model_name <my_name>` to overwrite the `name` given in the settings .json file
-
 
 # Example data
 The authors of [CARE](https://github.com/CSBDeep/CSBDeep/tree/master/examples) provide example data from different modalities.
