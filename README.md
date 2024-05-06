@@ -4,7 +4,7 @@ Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.c
 
 # Installation (care and n2v)
 
-## First time
+## Full setup with dependencies
 ---
 We strongly recommend using the [Anaconda Python distribution (64bit)](https://www.anaconda.com/distribution/) with Python == 3.9. Furthermore, we recommend to create a new conda virtual environment.
 
