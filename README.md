@@ -3,6 +3,8 @@
 Simple IPython based user interface to [CARE](http://csbdeep.bioimagecomputing.com/) a toolbox for Content-aware Image Restoration and to [Noise2Void](https://github.com/juglab/n2v) a self-supervised deep learning based denoising.
 
 # Installation (care and n2v)
+
+## First time
 ---
 We strongly recommend using the [Anaconda Python distribution (64bit)](https://www.anaconda.com/distribution/) with Python == 3.9. Furthermore, we recommend to create a new conda virtual environment.
 
@@ -13,6 +15,13 @@ Download the `environment.yml` from this repository, then:
 ```
 conda env create -f environment.yml
 conda activate careless
+```
+## Just update *careless*
+To just update careless to current master branch
+
+```
+conda activate careless
+pip install -U git+https://github.com/sommerc/careless.git
 ```
 
 ## Windows 
