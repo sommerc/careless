@@ -45,6 +45,12 @@ Verify the installation by:
 
 This should output your GPU device.
 
+# CARE and N2V on SLURM cluster
+Both CARE and N2V are supported on a SLURM cluster. 
+
+  - [carelass care on slurm](https://git.ista.ac.at/csommer/care_service)
+  - [carelass N2V on slurm](https://git.ista.ac.at/csommer/n2v_service)
+
 # CARE and N2V in Jupyter
 
 ### Download notebooks
