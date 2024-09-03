@@ -6,7 +6,7 @@ dependencies:
 - pip
 - cudatoolkit=11.2 
 - cudnn=8.1.0
-- numpy
+- numpy=1.26.4
 - git
 - openjdk=8
 - pip:
