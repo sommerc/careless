@@ -27,12 +27,14 @@ from ..care.utils import (
     get_space_time_resolution,
     get_file_list,
     JVM,
+    save_results,
 )
 from ..care.care import (
     GuiParams,
     select_project,
     select_train_paramter,
     select_file_to_predict,
+    select_output_zarr,
 )
 
 description = """Careless Noise2Void interface"""
@@ -56,6 +58,7 @@ class GuiParamsN2V(GuiParams):
         self["n2v_neighborhood_radius"] = 5
         self["augment"] = False
         self["structuredN2V"] = "None"
+        self["output_zarr"] = False
 
 
 params = GuiParamsN2V()
@@ -65,6 +68,7 @@ select_project = partial(
     select_project, default_name="./careless_n2v.json", params=params
 )
 select_train_paramter = partial(select_train_paramter, params=params)
+select_output_zarr = partial(select_output_zarr, params=params)
 
 
 def select_input(params=params):
@@ -159,7 +163,6 @@ def select_input(params=params):
             if z_dim == 1:
                 params["axes"] = "YX"
             else:
-
                 params["axes"] = "ZYX"
 
             params["train_channels"] = list(range(pix_dim.c))
@@ -539,18 +542,28 @@ def train_predict(
             unit = pixel_reso.Xunit
             finterval = pixel_reso.T
 
-            tifffile.imsave(
-                "{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c),
+            save_results(
+                "{}_n2v_pred_ch{}".format(str(f)[:-4], c),
                 pred,
-                imagej=True,
-                resolution=reso,
-                metadata={
-                    "axes": "TZCYX",
-                    "finterval": finterval,
-                    "spacing": spacing,
-                    "unit": unit,
-                },
+                reso,
+                finterval,
+                spacing,
+                unit,
+                ome_zarr=params["output_zarr"],
             )
+
+            # tifffile.imsave(
+            #     "{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c),
+            #     pred,
+            #     imagej=True,
+            #     resolution=reso,
+            #     metadata={
+            #         "axes": "TZCYX",
+            #         "finterval": finterval,
+            #         "spacing": spacing,
+            #         "unit": unit,
+            #     },
+            # )
 
 
 def predict(files, n_tiles=(1, 4, 4), params=params):
@@ -601,18 +614,28 @@ def predict(files, n_tiles=(1, 4, 4), params=params):
             unit = pixel_reso.Xunit
             finterval = pixel_reso.T
 
-            tifffile.imsave(
-                "{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c),
+            save_results(
+                "{}_n2v_pred_ch{}".format(str(f)[:-4], c),
                 pred,
-                imagej=True,
-                resolution=reso,
-                metadata={
-                    "axes": "TZCYX",
-                    "finterval": finterval,
-                    "spacing": spacing,
-                    "unit": unit,
-                },
+                reso,
+                finterval,
+                spacing,
+                unit,
+                ome_zarr=params["output_zarr"],
             )
+
+            # tifffile.imsave(
+            #     "{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c),
+            #     pred,
+            #     imagej=True,
+            #     resolution=reso,
+            #     metadata={
+            #         "axes": "TZCYX",
+            #         "finterval": finterval,
+            #         "spacing": spacing,
+            #         "unit": unit,
+            #     },
+            # )
 
 
 def cmd_line():

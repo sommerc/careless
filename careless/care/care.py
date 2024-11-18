@@ -68,6 +68,7 @@ class GuiParams(dict):
         self["train_steps_per_epoch"] = 100
         self["train_batch_size"] = 16
         self["probabilistic"] = False
+        self["output_zarr"] = False
 
 
 params = GuiParams()
@@ -379,6 +380,35 @@ def select_probabilistic(params=params):
             value="<i><b>experimental</b>, prediction output will contain mean and scale as channels</i>"
         )
     )
+    display(probab)
+
+
+### Output Zarr
+###################
+def select_output_zarr(params=params):
+    dd_output_zarr = widgets.Dropdown(
+        options=[False, True], value=params["output_zarr"]
+    )
+
+    def on_dd_output_zarr_change(change):
+        params["output_zarr"] = change.new
+
+    dd_output_zarr.observe(on_dd_output_zarr_change, "value")
+
+    probab = widgets.VBox(
+        [
+            widgets.HBox(
+                [
+                    widgets.Label(
+                        "Output ome-zarr (not tif)", layout={"width": "200px"}
+                    ),
+                    dd_output_zarr,
+                ]
+            ),
+        ]
+    )
+
+    display(widgets.HTML(value="<i><b>experimental</b>,</i>"))
     display(probab)
 
 

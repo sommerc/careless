@@ -3,12 +3,58 @@ import re
 import time
 import numpy
 import pathlib
+import tifffile
 import javabridge as jv
 import bioformats as bf
 from collections import namedtuple
 
 Axes = namedtuple("Axes", "t z c y x")
 Reso = namedtuple("PixelSize", "X Y Z T Xunit Yunit Zunit Tunit")
+
+
+def save_results(fn, image, reso, finterval, spacing, unit, ome_zarr=False):
+    if not ome_zarr:
+        tifffile.imwrite(
+            fn + ".tiff",
+            image,
+            imagej=True,
+            resolution=reso,
+            metadata={
+                "axes": "TZCYX",
+                "finterval": finterval,
+                "spacing": spacing,
+                "unit": unit,
+            },
+        )
+    else:
+        import numpy as np
+        import zarr
+        import os
+
+        from ome_zarr.io import parse_url
+        from ome_zarr.writer import write_image
+
+        path = f"{fn}.zarr"
+        os.makedirs(path, exist_ok=True)
+        store = parse_url(path, mode="w").store
+        root = zarr.group(store=store)
+
+        image_tzcyx_shape = image.shape
+
+        axes = ""
+        if image_tzcyx_shape[0] > 1:
+            axes += "t"
+
+        if image_tzcyx_shape[1] > 1:
+            axes += "z"
+
+        axes += "yx"
+
+        write_image(
+            image=image.squeeze(),
+            group=root,
+            axes=axes,
+        )
 
 
 def get_space_time_resolution(img_path):
@@ -251,9 +297,9 @@ class BFListReader(object):
             dim = self.get_axes(fn)
             dims.append(dim)
 
-        assert dims.count(dims[0]) == len(
-            dims
-        ), "Dimensions of image files do not match: " + ", ".join(dims)
+        assert dims.count(dims[0]) == len(dims), (
+            "Dimensions of image files do not match: " + ", ".join(dims)
+        )
 
         self.axes = dims[0]
         return dims[0]
