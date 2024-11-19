@@ -10,7 +10,7 @@ with open("careless/version.py", "r") as f:
 setup(
     name="CAREless",
     packages=["careless", "careless.care", "careless.n2v"],
-    version=__version__,
+    version=__version__,  # noqa: F821
     description=description,
     long_description=description,
     long_description_content_type="text/markdown",
