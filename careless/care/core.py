@@ -39,6 +39,7 @@ from .utils import (
     get_space_time_resolution,
     Timer,
     check_file_lists,
+    save_results,
 )
 
 
@@ -105,7 +106,7 @@ class CareInputConverter(object):
                             anti_aliasing=True,
                         )
 
-                    tifffile.imsave(
+                    tifffile.imwrite(
                         out_tif,
                         img_3d_ch[:, None, :, :].astype(dtype),
                         imagej=True,
@@ -282,12 +283,12 @@ class CareTrainer(object):
                 model.export_TF()
                 print("Done")
 
-    def predict_multiple(self, file_fns, n_tiles=(1, 4, 4), keep_meta=True):
+    def predict_multiple(self, file_fns, n_tiles=(1, 4, 4)):
         file_list = file_fns.split("\n")
         for file_fn in file_list:
-            self.predict(file_fn.strip(), n_tiles=n_tiles, keep_meta=keep_meta)
+            self.predict(file_fn.strip(), n_tiles=n_tiles)
 
-    def predict(self, file_fn, n_tiles=(1, 4, 4), keep_meta=True):
+    def predict(self, file_fn, n_tiles=(1, 4, 4)):
         JVM().start()
 
         pixel_reso = get_space_time_resolution(file_fn)
@@ -379,28 +380,10 @@ class CareTrainer(object):
                     res_image_ch[t, :, 0, :, :] = pred.mean()
                     res_image_ch[t, :, 1, :, :] = pred.scale()
 
-                if False:
-                    ch_t_out_fn = os.path.join(
-                        os.path.dirname(file_fn),
-                        os.path.splitext(os.path.basename(file_fn))[0]
-                        + "_care_predict_tp{:04d}_ch{}.tif".format(t, ch),
-                    )
-                    print(
-                        "Saving time-point {} and channel {} to file '{}'".format(
-                            t, ch, ch_t_out_fn
-                        )
-                    )
-                    tifffile.imsave(
-                        ch_t_out_fn,
-                        pred[None, :, None, :, :],
-                        imagej=True,
-                        metadata={"axes": "TZCYX"},
-                    )
-
             ch_out_fn = os.path.join(
                 os.path.dirname(file_fn),
                 os.path.splitext(os.path.basename(file_fn))[0]
-                + "_care_predict_ch{}.tiff".format(ch),
+                + "_care_predict_ch{}".format(ch),
             )
             print(
                 " -- Saving channel {} CARE prediction to file '{}'".format(
@@ -408,29 +391,23 @@ class CareTrainer(object):
                 )
             )
 
-            if keep_meta:
-                reso = (
-                    1 / (pixel_reso.X / self.low_scaling[2]),
-                    1 / (pixel_reso.Y / self.low_scaling[1]),
-                )
-                spacing = pixel_reso.Z / self.low_scaling[0]
-                unit = pixel_reso.Xunit
-                finterval = pixel_reso.T
+            reso = (
+                1 / (pixel_reso.X / self.low_scaling[2]),
+                1 / (pixel_reso.Y / self.low_scaling[1]),
+            )
+            spacing = pixel_reso.Z / self.low_scaling[0]
+            unit = pixel_reso.Xunit
+            finterval = pixel_reso.T
 
-                tifffile.imsave(
-                    ch_out_fn,
-                    res_image_ch,
-                    imagej=True,
-                    resolution=reso,
-                    metadata={
-                        "axes": "TZCYX",
-                        "finterval": finterval,
-                        "spacing": spacing,
-                        "unit": unit,
-                    },
-                )
-            else:
-                tifffile.imsave(ch_out_fn, res_image_ch)
+            save_results(
+                ch_out_fn,
+                res_image_ch,
+                reso,
+                finterval,
+                spacing,
+                unit,
+                ome_zarr=self.output_zarr,
+            )
 
             res_image_ch = None  # should trigger gc and free the memory
 
