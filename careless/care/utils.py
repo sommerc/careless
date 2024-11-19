@@ -12,11 +12,11 @@ Axes = namedtuple("Axes", "t z c y x")
 Reso = namedtuple("PixelSize", "X Y Z T Xunit Yunit Zunit Tunit")
 
 
-def save_results(fn, image, reso, finterval, spacing, unit, ome_zarr=False):
+def save_results(fn, image_5d, reso, finterval, spacing, unit, ome_zarr=False):
     if not ome_zarr:
         tifffile.imwrite(
             fn + ".tiff",
-            image,
+            image_5d,
             imagej=True,
             resolution=reso,
             metadata={
@@ -34,12 +34,12 @@ def save_results(fn, image, reso, finterval, spacing, unit, ome_zarr=False):
         from ome_zarr.io import parse_url
         from ome_zarr.writer import write_image
 
-        path = f"{fn}.zarr"
+        path = f"{fn}.ome.zarr"
         os.makedirs(path, exist_ok=True)
         store = parse_url(path, mode="w").store
-        root = zarr.group(store=store)
+        root = zarr.group(store=store, overwrite=True)
 
-        image_tzcyx_shape = image.shape
+        image_tzcyx_shape = image_5d.shape
 
         axes = ""
         if image_tzcyx_shape[0] > 1:
@@ -51,7 +51,7 @@ def save_results(fn, image, reso, finterval, spacing, unit, ome_zarr=False):
         axes += "yx"
 
         write_image(
-            image=image.squeeze(),
+            image=image_5d.squeeze(),
             group=root,
             axes=axes,
         )

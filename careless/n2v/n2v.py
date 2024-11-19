@@ -552,24 +552,11 @@ def train_predict(
                 ome_zarr=params["output_zarr"],
             )
 
-            # tifffile.imsave(
-            #     "{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c),
-            #     pred,
-            #     imagej=True,
-            #     resolution=reso,
-            #     metadata={
-            #         "axes": "TZCYX",
-            #         "finterval": finterval,
-            #         "spacing": spacing,
-            #         "unit": unit,
-            #     },
-            # )
-
 
 def predict(files, n_tiles=(1, 4, 4), params=params):
     from n2v.models import N2V
 
-    files = [f.strip() for f in files.split(";")]
+    files = [f.strip() for f in files.split("\n")]
     datagen = BFListReader()
     datagen.from_file_list(files)
 
@@ -623,19 +610,6 @@ def predict(files, n_tiles=(1, 4, 4), params=params):
                 unit,
                 ome_zarr=params["output_zarr"],
             )
-
-            # tifffile.imsave(
-            #     "{}_n2v_pred_ch{}.tiff".format(str(f)[:-4], c),
-            #     pred,
-            #     imagej=True,
-            #     resolution=reso,
-            #     metadata={
-            #         "axes": "TZCYX",
-            #         "finterval": finterval,
-            #         "spacing": spacing,
-            #         "unit": unit,
-            #     },
-            # )
 
 
 def cmd_line():
