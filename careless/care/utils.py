@@ -52,7 +52,7 @@ def save_results(fn, image_5d, reso, finterval, spacing, unit, ome_zarr=False):
 
         write_image(
             image=image_5d.squeeze(),
-            group=root,
+            group=root.create_group("channel0"),
             axes=axes,
         )
 
