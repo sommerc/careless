@@ -128,8 +128,9 @@ class CareTrainer(object):
         self.order = 0
         self.headless = headless
 
-        if len(params) == 0:
-            from .care import params
+        from .care import params as params_default
+
+        self.__dict__.update(**params_default)
         self.__dict__.update(**params)
 
     def create_patches(self, normalization=None):
@@ -457,9 +458,9 @@ def cmd_line_predict():
     from .care import GuiParams
 
     args = get_args()
-    assert os.path.exists(
-        args.care_project[0]
-    ), f"Project file '{args.care_project[0]}'' does not exist."
+    assert os.path.exists(args.care_project[0]), (
+        f"Project file '{args.care_project[0]}'' does not exist."
+    )
 
     params = GuiParams()
     params.load(args.care_project[0])
@@ -506,9 +507,9 @@ def cmd_line_train():
     from .care import GuiParams
 
     args = get_args()
-    assert os.path.exists(
-        args.care_project[0]
-    ), f"Project file '{args.care_project[0]}'' does not exist."
+    assert os.path.exists(args.care_project[0]), (
+        f"Project file '{args.care_project[0]}'' does not exist."
+    )
 
     params = GuiParams()
     params.load(args.care_project[0])

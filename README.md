@@ -92,7 +92,8 @@ Training and predictions of CARE*less* CARE can also be done in the command line
     "train_steps_per_epoch": 10, # training steps per epoch
     "train_batch_size": 32,      # training batch-size
     "probabilistic": false,      # probabilistic CARE?     
-    "name": "my-care-test",      # choose model name 
+    "name": "my-care-test",      # choose model name
+    "output_zarr": False,        # choose to output zarr instead of tiff 
     "low_scaling": [2.0, 1.992, 2.0] # the up-scaling (inferred automatically in training)
 }
 ``` 
