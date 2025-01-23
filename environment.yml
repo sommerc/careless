@@ -20,5 +20,7 @@ dependencies:
   - python-javabridge
   - python-bioformats
   - jupyterlab
+  - zarr
+  - ome-zarr
   - git+https://github.com/sommerc/careless.git
 
